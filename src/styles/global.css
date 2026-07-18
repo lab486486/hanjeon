@@ -265,6 +265,19 @@ img {
   background: #fffdf9;
 }
 
+.hero__shortcut--accent {
+  grid-column: 1 / -1;
+  background: var(--navy-deep);
+  border-color: var(--navy-deep);
+  color: #fff;
+}
+
+.hero__shortcut--accent:hover {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
 .section {
   padding: 2.25rem 0;
 }
