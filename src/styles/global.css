@@ -73,8 +73,24 @@ img {
 
 .brand {
   display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.brand__logo {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.brand__text {
+  display: flex;
   flex-direction: column;
   gap: 0.05rem;
+  min-width: 0;
 }
 
 .brand__name {
@@ -82,13 +98,15 @@ img {
   font-weight: 800;
   font-size: 1.25rem;
   letter-spacing: -0.03em;
-  color: var(--navy-deep);
+  color: #c62828;
+  line-height: 1.15;
 }
 
 .brand__tag {
   font-size: 0.72rem;
   color: var(--ink-soft);
   letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 .nav {

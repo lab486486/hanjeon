@@ -31,7 +31,9 @@ const nav = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link
       rel="stylesheet"
       as="style"
@@ -44,8 +46,11 @@ const nav = [
     <header class="site-header">
       <div class="container site-header__inner">
         <a class="brand" href="/">
-          <span class="brand__name">한전넷</span>
-          <span class="brand__tag">전기·에너지 지원금 안내</span>
+          <img class="brand__logo" src="/logo.png" alt="" width="36" height="36" decoding="async" />
+          <span class="brand__text">
+            <span class="brand__name">한전넷</span>
+            <span class="brand__tag">전기·에너지 지원금 안내</span>
+          </span>
         </a>
         <nav class="nav" aria-label="주요">
           {
