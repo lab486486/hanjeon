@@ -12,8 +12,11 @@
   --danger: #b91c1c;
   --shadow: 0 18px 50px rgba(15, 39, 68, 0.08);
   --radius: 14px;
-  --font-sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-  --font-display: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  /* 웹폰트 CDN 없이 시스템 글꼴만 사용해 FCP/LCP를 빠르게 유지 */
+  --font-sans: "Apple SD Gothic Neo", "Malgun Gothic", "Nanum Gothic", "Noto Sans KR",
+    "Segoe UI", sans-serif;
+  --font-display: "Apple SD Gothic Neo", "Malgun Gothic", "Nanum Gothic", "Noto Sans KR",
+    "Segoe UI", sans-serif;
   --max: 1080px;
 }
 

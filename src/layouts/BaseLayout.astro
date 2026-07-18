@@ -31,22 +31,25 @@ const nav = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#f7f4ef" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link
-      rel="stylesheet"
-      as="style"
-      crossorigin
-      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
-    />
     <title>{fullTitle}</title>
   </head>
   <body>
     <header class="site-header">
       <div class="container site-header__inner">
         <a class="brand" href="/">
-          <img class="brand__logo" src="/logo.png" alt="" width="36" height="36" decoding="async" />
+          <img
+            class="brand__logo"
+            src="/logo.png"
+            alt=""
+            width="36"
+            height="36"
+            decoding="async"
+            fetchpriority="high"
+          />
           <span class="brand__text">
             <span class="brand__name">한전넷</span>
             <span class="brand__tag">전기·에너지 지원금 안내</span>

@@ -17,6 +17,7 @@
     "pages:dev": "npm run build && wrangler pages dev dist --compatibility-date=2025-07-01"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "astro": "^7.1.1"
   },
   "devDependencies": {

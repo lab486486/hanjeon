@@ -1,0 +1,23 @@
+# 한전넷
+
+> 전기요금·에너지 지원금 정보를 모아 안내하는 비공식 사이트입니다.
+> 한국전력공사·정부와 제휴·공식 관계가 없습니다.
+
+## 주요 페이지
+
+- [홈](https://hanjeon.net/): 핵심 혜택과 서비스 소개
+- [내 혜택 찾기](https://hanjeon.net/find/): 지역·관심 유형으로 지원금 좁히기
+- [혜택 목록](https://hanjeon.net/benefits/): 전기·에너지 관련 정책·지원금 전체 목록
+- [가이드](https://hanjeon.net/guides/): 복지할인·에너지바우처 등 핵심 안내
+- [소개](https://hanjeon.net/about/): 사이트 안내와 면책
+
+## 데이터 출처
+
+- [보조금24](https://www.gov.kr/portal/rcvfvrSvc/main)
+- [한전ON](https://online.kepco.co.kr/)
+- [무공해차 통합누리집](https://ev.or.kr/)
+
+## 연락·운영
+
+콘텐츠는 보조금24 Open API와 수동 검수를 통해 갱신합니다.
+신청·자격·금액은 반드시 각 기관 원문에서 확인하세요.
