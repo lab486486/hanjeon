@@ -27,10 +27,13 @@ const benefits = defineCollection({
     sourceUrl: z.string().url(),
     sourceName: z.string().default('보조금24'),
     verifiedAt: z.string(),
+    serviceId: z.string().optional(),
+    synced: z.boolean().default(false),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
   }),
 });
+
 
 const guides = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/guides' }),

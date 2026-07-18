@@ -13,8 +13,12 @@
 
 ```bash
 npm install
+cp .dev.vars.example .dev.vars   # ODCLOUD_SERVICE_KEY, GitHub OAuth 등
+npm run sync:benefits            # 보조금24 API → src/content/benefits
 npm run dev
 ```
+
+공공서비스(혜택) API 키는 `.dev.vars`의 `ODCLOUD_SERVICE_KEY`(Decoding 키)에 넣습니다. 저장소에 커밋하지 마세요.
 
 정적 페이지만 확인할 때는 `astro dev`로 충분합니다. OAuth/R2 Functions까지 보려면:
 

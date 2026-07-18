@@ -53,6 +53,8 @@ collections:
       - { label: 원문 URL, name: sourceUrl, widget: string }
       - { label: 출처명, name: sourceName, widget: string, default: 보조금24 }
       - { label: 확인일, name: verifiedAt, widget: string }
+      - { label: 서비스ID, name: serviceId, widget: string, required: false }
+      - { label: API 동기화, name: synced, widget: boolean, default: false }
       - { label: 핵심 노출, name: featured, widget: boolean, default: false }
       - { label: 초안, name: draft, widget: boolean, default: false }
       - { label: 본문, name: body, widget: markdown }

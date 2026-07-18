@@ -12,6 +12,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
+    "sync:benefits": "node scripts/sync-benefits.mjs",
+    "build:sync": "npm run sync:benefits && npm run build",
     "pages:dev": "npm run build && wrangler pages dev dist --compatibility-date=2025-07-01"
   },
   "dependencies": {

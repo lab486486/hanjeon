@@ -4,3 +4,6 @@
 GITHUB_CLIENT_ID=Ov23liHBdym997zhoWl4
 GITHUB_CLIENT_SECRET=replace-with-github-oauth-client-secret
 MEDIA_PUBLIC_BASE=https://media.hanjeon.net
+
+# data.go.kr — 행정행안부 공공서비스(혜택) API (Decoding 키 권장)
+ODCLOUD_SERVICE_KEY=replace-with-odcloud-service-key
