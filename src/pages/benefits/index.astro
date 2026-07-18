@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BenefitRow from '../../components/BenefitRow.astro';
+import { CATEGORIES, getPublishedBenefits, matchesFilters } from '../../lib/benefits';
+
+const all = await getPublishedBenefits();
+const params = Astro.url.searchParams;
+const region = params.get('region') ?? '';
+const category = params.get('category') ?? '';
+const keyword = params.get('q') ?? '';
+
+const benefits = all.filter((b) => matchesFilters(b, { region, category, keyword }));
+const regions = [...new Set(all.map((b) => b.data.region))].sort();
+---
+
+<BaseLayout title="혜택 목록" description="전기·에너지 관련 정책·지원금 목록" path="/benefits/">
+  <section class="section" style="padding-top: 2.5rem;">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>혜택 목록</h2>
+          <p>{benefits.length}건 · 출처·확인일 기준 정리</p>
+        </div>
+      </div>
+
+      <form class="filters" method="get" action="/benefits/">
+        <div class="filters__row">
+          <label class="field">
+            지역
+            <select name="region">
+              <option value="">전체</option>
+              {regions.map((r) => <option value={r} selected={region === r}>{r}</option>)}
+            </select>
+          </label>
+          <label class="field">
+            카테고리
+            <select name="category">
+              <option value="">전체</option>
+              {
+                CATEGORIES.map((c) => (
+                  <option value={c} selected={category === c}>
+                    {c}
+                  </option>
+                ))
+              }
+            </select>
+          </label>
+          <label class="field">
+            검색
+            <input type="search" name="q" value={keyword} placeholder="예: 복지할인, 바우처" />
+          </label>
+        </div>
+        <button class="btn btn--dark" type="submit">필터 적용</button>
+      </form>
+
+      <div class="benefit-list">
+        {
+          benefits.length > 0 ? (
+            benefits.map((benefit) => <BenefitRow benefit={benefit} />)
+          ) : (
+            <p class="notice">조건에 맞는 혜택이 없습니다. 필터를 넓혀 보세요.</p>
+          )
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>

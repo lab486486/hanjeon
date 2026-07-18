@@ -1,0 +1,13 @@
+name = "hanjeon"
+compatibility_date = "2025-07-01"
+pages_build_output_dir = "dist"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "hanjeon-media"
+preview_bucket_name = "hanjeon-media"
+
+[vars]
+GITHUB_CLIENT_ID = "Ov23liHBdym997zhoWl4"
+# Public URL prefix for R2 objects (custom domain or r2.dev)
+# MEDIA_PUBLIC_BASE = "https://media.hanjeon.net"

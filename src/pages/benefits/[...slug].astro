@@ -1,0 +1,67 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { deadlineLabel, getPublishedBenefits } from '../../lib/benefits';
+
+export async function getStaticPaths() {
+  const benefits = await getPublishedBenefits();
+  return benefits.map((benefit) => ({
+    params: { slug: benefit.id },
+    props: { benefit },
+  }));
+}
+
+const { benefit } = Astro.props;
+const { Content } = await render(benefit);
+const dday = deadlineLabel(benefit);
+---
+
+<BaseLayout title={benefit.data.title} description={benefit.data.targetSummary} path="/benefits/">
+  <article class="detail-hero">
+    <div class="container">
+      <div class="benefit-row__meta">
+        <span class="chip chip--amber">{benefit.data.category}</span>
+        <span class="chip">{benefit.data.region}</span>
+        <span class="chip">{benefit.data.org}</span>
+        <span class="chip">{dday}</span>
+      </div>
+      <h1>{benefit.data.title}</h1>
+      <p class="hero__lead">{benefit.data.targetSummary}</p>
+
+      <div class="detail-panel">
+        <dl>
+          <dt>최대 지원</dt>
+          <dd><strong>{benefit.data.maxBenefit}</strong></dd>
+          <dt>지원 대상</dt>
+          <dd>{benefit.data.targetSummary}</dd>
+          <dt>신청 기간</dt>
+          <dd>
+            {
+              benefit.data.alwaysOpen
+                ? '상시 (기관 안내에 따름)'
+                : `${benefit.data.applyStart ?? '미정'} ~ ${benefit.data.applyEnd ?? '미정'}`
+            }
+          </dd>
+          <dt>출처</dt>
+          <dd>{benefit.data.sourceName}</dd>
+          <dt>확인일</dt>
+          <dd>{benefit.data.verifiedAt}</dd>
+        </dl>
+      </div>
+
+      <p>
+        <a class="btn btn--primary" href={benefit.data.sourceUrl} target="_blank" rel="noopener noreferrer">
+          원문에서 확인·신청
+        </a>
+      </p>
+
+      <div class="prose" style="margin-top: 2rem;">
+        <Content />
+      </div>
+
+      <div class="notice">
+        본 안내는 민간 요약입니다. 자격·금액·서류는 원문 공고와 다를 수 있습니다.
+      </div>
+    </div>
+  </article>
+</BaseLayout>

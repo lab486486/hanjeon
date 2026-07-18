@@ -1,0 +1,6 @@
+# Copy to .dev.vars (gitignored) for local Pages Functions testing.
+# Also set the same secrets in Cloudflare Pages → Settings → Environment variables.
+
+GITHUB_CLIENT_ID=Ov23liHBdym997zhoWl4
+GITHUB_CLIENT_SECRET=replace-with-github-oauth-client-secret
+MEDIA_PUBLIC_BASE=https://media.hanjeon.net

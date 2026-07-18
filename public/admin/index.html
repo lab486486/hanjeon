@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>한전넷 CMS</title>
+  </head>
+  <body>
+    <script src="https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js"></script>
+    <script>
+      CMS.registerMediaLibrary({
+        name: 'r2',
+        config: {},
+        init({ handleInsert } = {}) {
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = 'image/*';
+          input.hidden = true;
+          document.body.appendChild(input);
+
+          input.addEventListener('change', async () => {
+            const file = input.files && input.files[0];
+            input.value = '';
+            if (!file) return;
+
+            const form = new FormData();
+            form.append('file', file);
+
+            try {
+              const res = await fetch('/api/media', {
+                method: 'POST',
+                body: form,
+              });
+              if (!res.ok) {
+                alert('업로드 실패: ' + (await res.text()));
+                return;
+              }
+              const data = await res.json();
+              handleInsert(data.url);
+            } catch (err) {
+              alert('업로드 오류: ' + (err && err.message ? err.message : err));
+            }
+          });
+
+          return {
+            show() {
+              input.click();
+            },
+            hide() {},
+            enableStandalone() {
+              return false;
+            },
+          };
+        },
+      });
+    </script>
+  </body>
+</html>

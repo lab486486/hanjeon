@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BenefitRow from '../components/BenefitRow.astro';
+import { getPublishedBenefits, matchesFilters } from '../lib/benefits';
+
+const all = await getPublishedBenefits();
+const params = Astro.url.searchParams;
+const region = params.get('region') ?? '';
+const category = params.get('category') ?? '';
+const hasResult = params.has('region') || params.has('category');
+
+const results = hasResult
+  ? all.filter((b) => matchesFilters(b, { region: region || undefined, category: category || undefined }))
+  : [];
+
+const regions = ['서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
+const interests = [
+  { value: '요금할인', label: '전기요금 할인' },
+  { value: '바우처', label: '에너지바우처' },
+  { value: '공동전기료', label: '공동전기료' },
+  { value: '전기차', label: '전기차·충전기' },
+  { value: '안전점검', label: '안전점검' },
+];
+---
+
+<BaseLayout title="내 혜택 찾기" description="지역과 관심 유형으로 전기·에너지 지원금을 좁혀보세요." path="/find/">
+  <section class="section" style="padding-top: 2.5rem;">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>내 혜택 찾기</h2>
+          <p>두 가지만 고르면 관련 혜택을 보여줍니다.</p>
+        </div>
+      </div>
+
+      <form class="quiz" method="get" action="/find/">
+        <div class="quiz__step">
+          <strong>1. 거주 지역</strong>
+          <div class="quiz__options" id="region-options">
+            <label class="field" style="width: 100%;">
+              <select name="region" required>
+                <option value="">선택</option>
+                <option value="전국" selected={region === '전국'}>전국 공통도 포함</option>
+                {regions.map((r) => <option value={r} selected={region === r}>{r}</option>)}
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="quiz__step">
+          <strong>2. 관심 유형</strong>
+          <div class="quiz__options">
+            {
+              interests.map((item) => (
+                <label>
+                  <input type="radio" name="category" value={item.value} checked={category === item.value} required />
+                  {item.label}
+                </label>
+              ))
+            }
+          </div>
+        </div>
+
+        <button class="btn btn--primary" type="submit">결과 보기</button>
+      </form>
+
+      {
+        hasResult && (
+          <div style="margin-top: 2rem;">
+            <div class="section__head">
+              <div>
+                <h2>추천 결과</h2>
+                <p>{results.length}건</p>
+              </div>
+              <a href="/benefits/">전체 목록 →</a>
+            </div>
+            <div class="benefit-list">
+              {results.length > 0 ? (
+                results.map((benefit) => <BenefitRow benefit={benefit} />)
+              ) : (
+                <p class="notice">
+                  조건에 맞는 항목이 아직 적습니다. 전국 공통 혜택을 보거나 카테고리를 바꿔 보세요.
+                </p>
+              )}
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>

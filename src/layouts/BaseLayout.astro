@@ -1,0 +1,80 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  path?: string;
+}
+
+const {
+  title = '한전넷',
+  description = '전기요금·에너지 지원금을 모아 보는 민간 안내 사이트',
+  path = Astro.url.pathname,
+} = Astro.props;
+
+const fullTitle = title === '한전넷' ? '한전넷 — 전기·에너지 지원금 안내' : `${title} | 한전넷`;
+const nav = [
+  { href: '/', label: '홈' },
+  { href: '/find/', label: '내 혜택 찾기' },
+  { href: '/benefits/', label: '혜택 목록' },
+  { href: '/guides/', label: '가이드' },
+  { href: '/about/', label: '소개' },
+];
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+    />
+    <title>{fullTitle}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="brand" href="/">
+          <span class="brand__name">한전넷</span>
+          <span class="brand__tag">전기·에너지 지원금 안내</span>
+        </a>
+        <nav class="nav" aria-label="주요">
+          {
+            nav.map((item) => (
+              <a href={item.href} aria-current={path === item.href || (item.href !== '/' && path.startsWith(item.href)) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__grid">
+        <p>
+          <strong>한전넷(hanjeon.net)</strong>은 한국전력공사·정부 공식 사이트가 아닙니다.
+          신청·자격 확인은 반드시 원문(보조금24, 한전ON, 지자체 공고 등)에서 하세요.
+        </p>
+        <p>콘텐츠 최종 반영일은 각 혜택 상세의 ‘확인일’을 기준으로 합니다.</p>
+        <p>
+          <a href="/about/">소개·면책</a>
+          ·
+          <a href="/admin/">콘텐츠 관리</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,29 @@
+---
+import { deadlineLabel, type Benefit } from '../lib/benefits';
+
+interface Props {
+  benefit: Benefit;
+}
+
+const { benefit } = Astro.props;
+const dday = deadlineLabel(benefit);
+const urgent = dday.startsWith('D-') && Number(dday.slice(2)) <= 14;
+---
+
+<a class="benefit-row" href={`/benefits/${benefit.id}/`}>
+  <div>
+    <div class="benefit-row__meta">
+      <span class="chip chip--amber">{benefit.data.category}</span>
+      <span class="chip">{benefit.data.region}</span>
+      <span class="chip">{benefit.data.org}</span>
+    </div>
+    <h3>{benefit.data.title}</h3>
+    <p class="benefit-row__summary">{benefit.data.targetSummary}</p>
+  </div>
+  <div class="benefit-row__side">
+    <span class="benefit-row__amount">{benefit.data.maxBenefit}</span>
+    <span class:list={['chip', urgent ? 'chip--danger' : dday === '상시' ? 'chip--ok' : '']}>
+      {dday}
+    </span>
+  </div>
+</a>

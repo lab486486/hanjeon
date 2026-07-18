@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BenefitRow from '../components/BenefitRow.astro';
+import { daysUntil, getPublishedBenefits } from '../lib/benefits';
+
+const benefits = await getPublishedBenefits();
+const featured = benefits.filter((b) => b.data.featured).slice(0, 5);
+const closingSoon = benefits
+  .filter((b) => {
+    const d = daysUntil(b.data.applyEnd);
+    return d !== null && d >= 0 && d <= 45;
+  })
+  .slice(0, 5);
+---
+
+<BaseLayout title="한전넷" description="내게 해당하는 전기요금·에너지 지원금을 빠르게 찾아보세요.">
+  <section class="hero">
+    <div class="container hero__grid">
+      <div>
+        <span class="hero__kicker">HANJEON.NET</span>
+        <h1>한전넷</h1>
+        <p class="hero__lead">
+          전기요금 할인, 에너지바우처, 공동전기료, 전기차 지원까지.
+          공식 출처 기준으로 모아 두고, 확인일을 함께 표기합니다.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="/find/">내 혜택 찾기</a>
+          <a class="btn btn--ghost" href="/benefits/">전체 목록 보기</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>핵심 혜택</h2>
+          <p>검색·신청이 많은 전기·에너지 지원부터</p>
+        </div>
+        <a href="/guides/">가이드 보기 →</a>
+      </div>
+      <div class="benefit-list">
+        {featured.map((benefit) => <BenefitRow benefit={benefit} />)}
+      </div>
+    </div>
+  </section>
+
+  {
+    closingSoon.length > 0 && (
+      <section class="section">
+        <div class="container">
+          <div class="section__head">
+            <div>
+              <h2>마감 임박</h2>
+              <p>신청 종료일이 가까운 항목</p>
+            </div>
+          </div>
+          <div class="benefit-list">
+            {closingSoon.map((benefit) => (
+              <BenefitRow benefit={benefit} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section">
+    <div class="container">
+      <div class="notice">
+        한전넷은 민간 안내 사이트입니다. 자격·금액·기간은 기관 사정으로 바뀔 수 있으니
+        상세 페이지의 원문 링크에서 최종 확인하세요.
+      </div>
+    </div>
+  </section>
+</BaseLayout>

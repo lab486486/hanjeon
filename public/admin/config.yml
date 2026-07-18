@@ -1,0 +1,72 @@
+backend:
+  name: github
+  repo: lab486486/hanjeon
+  branch: main
+  base_url: https://hanjeon.net
+  auth_endpoint: api/auth
+  cms_label_prefix: hanjeon
+
+local_backend: false
+
+media_library:
+  name: r2
+
+# solo 운영: 바로 main에 커밋. PR 워크플로가 필요하면 editorial_workflow 로 변경
+# publish_mode: editorial_workflow
+
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  - name: benefits
+    label: 혜택/지원금
+    label_singular: 혜택
+    folder: src/content/benefits
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: yaml-frontmatter
+    fields:
+      - { label: 제목, name: title, widget: string }
+      - { label: 기관, name: org, widget: string }
+      - { label: 지역, name: region, widget: string, default: 전국 }
+      - label: 카테고리
+        name: category
+        widget: select
+        options:
+          - 요금할인
+          - 바우처
+          - 공동전기료
+          - 전기차
+          - 안전점검
+          - 시설지원
+          - 기타
+      - { label: 최대 지원, name: maxBenefit, widget: string, default: 확인 필요 }
+      - { label: 대상 요약, name: targetSummary, widget: string }
+      - { label: 지원성별, name: gender, widget: string, default: 제한없음 }
+      - { label: 신청 시작일, name: applyStart, widget: string, required: false }
+      - { label: 신청 종료일, name: applyEnd, widget: string, required: false }
+      - { label: 상시 모집, name: alwaysOpen, widget: boolean, default: false }
+      - { label: 원문 URL, name: sourceUrl, widget: string }
+      - { label: 출처명, name: sourceName, widget: string, default: 보조금24 }
+      - { label: 확인일, name: verifiedAt, widget: string }
+      - { label: 핵심 노출, name: featured, widget: boolean, default: false }
+      - { label: 초안, name: draft, widget: boolean, default: false }
+      - { label: 본문, name: body, widget: markdown }
+
+  - name: guides
+    label: 가이드
+    label_singular: 가이드
+    folder: src/content/guides
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: yaml-frontmatter
+    fields:
+      - { label: 제목, name: title, widget: string }
+      - { label: 설명, name: description, widget: string }
+      - { label: 정렬, name: order, widget: number, default: 99 }
+      - { label: 업데이트, name: updatedAt, widget: string }
+      - { label: 본문, name: body, widget: markdown }
