@@ -9,11 +9,12 @@ interface Props {
 
 const {
   title = '한전넷',
-  description = '전기요금·에너지 지원금을 모아 보는 민간 안내 사이트',
+  description = '전기요금·에너지 지원금을 모아 보는 비공식 안내 사이트',
   path = Astro.url.pathname,
 } = Astro.props;
 
 const fullTitle = title === '한전넷' ? '한전넷 — 전기·에너지 지원금 안내' : `${title} | 한전넷`;
+const year = new Date().getFullYear();
 const nav = [
   { href: '/', label: '홈' },
   { href: '/find/', label: '내 혜택 찾기' },
@@ -63,16 +64,11 @@ const nav = [
     </main>
 
     <footer class="site-footer">
-      <div class="container site-footer__grid">
-        <p>
-          <strong>한전넷(hanjeon.net)</strong>은 한국전력공사·정부 공식 사이트가 아닙니다.
-          신청·자격 확인은 반드시 원문(보조금24, 한전ON, 지자체 공고 등)에서 하세요.
-        </p>
-        <p>콘텐츠 최종 반영일은 각 혜택 상세의 ‘확인일’을 기준으로 합니다.</p>
-        <p>
-          <a href="/about/">소개·면책</a>
-          ·
-          <a href="/admin/">콘텐츠 관리</a>
+      <div class="container footer-inner">
+        <p class="footer-copy">© {year} hanjeon.net · 한전넷</p>
+        <p class="footer-note">
+          한전·한국전력 등은 관련 기관의 명칭이며, 본 사이트는 한국전력공사·정부와 제휴·공식 관계가 없는
+          비공식 안내용 사이트입니다. 지원 자격·금액·신청은 보조금24·한전ON 등 원문에서 확인해 주세요.
         </p>
       </div>
     </footer>
