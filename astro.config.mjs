@@ -8,6 +8,8 @@ export default defineConfig({
   output: 'static',
   build: {
     format: 'directory',
+    // Avoid /_astro/* — that path was edge-cached as HTML on the custom domain
+    assets: 'assets',
   },
   integrations: [
     sitemap({
