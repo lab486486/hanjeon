@@ -145,12 +145,14 @@ img {
 }
 
 .btn--primary {
-  background: var(--amber);
-  color: #fff7ed;
+  /* WCAG AA: #b45309 on #fff ≈ 5.0:1 (기존 #d97706은 3.0:1로 실패) */
+  background: var(--amber-deep);
+  color: #ffffff;
 }
 
 .btn--primary:hover {
-  background: var(--amber-deep);
+  background: #92400e;
+  color: #ffffff;
 }
 
 .btn--ghost {
