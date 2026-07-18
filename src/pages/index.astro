@@ -13,21 +13,33 @@ const closingSoon = benefits
   .slice(0, 5);
 ---
 
-<BaseLayout title="한전넷" description="내게 해당하는 전기요금·에너지 지원금을 빠르게 찾아보세요.">
+<BaseLayout title="한전넷" description="신청 가능한 전기요금·에너지 지원금을 빠르게 찾아보세요.">
   <section class="hero">
     <div class="container hero__grid">
-      <div>
+      <div class="hero__copy">
         <span class="hero__kicker">HANJEON.NET</span>
         <h1>한전넷</h1>
         <p class="hero__lead">
-          전기요금 할인, 에너지바우처, 공동전기료, 전기차 지원까지.
-          공식 출처 기준으로 모아 두고, 확인일을 함께 표기합니다.
+          전기요금 할인, 에너지바우처, 공동전기료, 전기차 지원까지.<br />
+          한전넷을 즐겨찾기 해놓고 편하게 확인하세요!
         </p>
         <div class="hero__actions">
-          <a class="btn btn--primary" href="/find/">내 혜택 찾기</a>
+          <a class="btn btn--primary" href="/find/">신청 가능한 지원금 찾기</a>
           <a class="btn btn--ghost" href="/benefits/">전체 목록 보기</a>
         </div>
       </div>
+
+      <aside class="hero__aside" aria-label="카테고리 바로가기">
+        <p class="hero__aside-label">관심 분야로 바로 보기</p>
+        <div class="hero__shortcuts">
+          <a class="hero__shortcut" href="/benefits/?category=%EC%9A%94%EA%B8%88%ED%95%A0%EC%9D%B8">요금할인</a>
+          <a class="hero__shortcut" href="/benefits/?category=%EB%B0%94%EC%9A%B0%EC%B2%98">바우처</a>
+          <a class="hero__shortcut" href="/benefits/?category=%EA%B3%B5%EB%8F%99%EC%A0%84%EA%B8%B0%EB%A3%8C">공동전기료</a>
+          <a class="hero__shortcut" href="/benefits/?category=%EC%A0%84%EA%B8%B0%EC%B0%A8">전기차</a>
+          <a class="hero__shortcut" href="/benefits/?category=%EC%95%88%EC%A0%84%EC%A0%90%EA%B2%80">안전점검</a>
+          <a class="hero__shortcut hero__shortcut--accent" href="/find/">맞춤 찾기 →</a>
+        </div>
+      </aside>
     </div>
   </section>
 
