@@ -1,17 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import BenefitRow from '../components/BenefitRow.astro';
-import { getPublishedBenefits, matchesFilters } from '../lib/benefits';
+import { getPublishedBenefits } from '../lib/benefits';
 
 const all = await getPublishedBenefits();
-const params = Astro.url.searchParams;
-const region = params.get('region') ?? '';
-const category = params.get('category') ?? '';
-const hasResult = params.has('region') || params.has('category');
-
-const results = hasResult
-  ? all.filter((b) => matchesFilters(b, { region: region || undefined, category: category || undefined }))
-  : [];
+const payload = all.map((b) => ({
+  id: b.id,
+  title: b.data.title,
+  org: b.data.org,
+  region: b.data.region,
+  category: b.data.category,
+  maxBenefit: b.data.maxBenefit,
+  targetSummary: b.data.targetSummary,
+  alwaysOpen: b.data.alwaysOpen,
+  applyEnd: b.data.applyEnd ?? '',
+}));
 
 const regions = ['서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
 const interests = [
@@ -33,15 +35,15 @@ const interests = [
         </div>
       </div>
 
-      <form class="quiz" method="get" action="/find/">
+      <form class="quiz" id="find-form" method="get" action="/find/">
         <div class="quiz__step">
           <strong>1. 거주 지역</strong>
-          <div class="quiz__options" id="region-options">
+          <div class="quiz__options">
             <label class="field" style="width: 100%;">
-              <select name="region" required>
+              <select name="region" id="find-region" required>
                 <option value="">선택</option>
-                <option value="전국" selected={region === '전국'}>전국 공통도 포함</option>
-                {regions.map((r) => <option value={r} selected={region === r}>{r}</option>)}
+                <option value="전국">전국 공통도 포함</option>
+                {regions.map((r) => <option value={r}>{r}</option>)}
               </select>
             </label>
           </div>
@@ -49,11 +51,11 @@ const interests = [
 
         <div class="quiz__step">
           <strong>2. 관심 유형</strong>
-          <div class="quiz__options">
+          <div class="quiz__options" id="find-categories">
             {
               interests.map((item) => (
                 <label>
-                  <input type="radio" name="category" value={item.value} checked={category === item.value} required />
+                  <input type="radio" name="category" value={item.value} required />
                   {item.label}
                 </label>
               ))
@@ -64,28 +66,125 @@ const interests = [
         <button class="btn btn--primary" type="submit">결과 보기</button>
       </form>
 
-      {
-        hasResult && (
-          <div style="margin-top: 2rem;">
-            <div class="section__head">
-              <div>
-                <h2>추천 결과</h2>
-                <p>{results.length}건</p>
-              </div>
-              <a href="/benefits/">전체 목록 →</a>
-            </div>
-            <div class="benefit-list">
-              {results.length > 0 ? (
-                results.map((benefit) => <BenefitRow benefit={benefit} />)
-              ) : (
-                <p class="notice">
-                  조건에 맞는 항목이 아직 적습니다. 전국 공통 혜택을 보거나 카테고리를 바꿔 보세요.
-                </p>
-              )}
-            </div>
+      <div id="find-results" class="find-results" hidden>
+        <div class="section__head">
+          <div>
+            <h2>추천 결과</h2>
+            <p><span id="find-count">0</span>건</p>
           </div>
-        )
-      }
+          <a href="/benefits/">전체 목록 →</a>
+        </div>
+        <div class="benefit-list" id="find-list"></div>
+        <p class="notice" id="find-empty" hidden>
+          조건에 맞는 항목이 아직 적습니다. 전국 공통 혜택을 보거나 카테고리를 바꿔 보세요.
+        </p>
+      </div>
     </div>
   </section>
+
+  <script id="find-data" type="application/json" is:inline set:html={JSON.stringify(payload)} />
+
+  <script is:inline>
+    (function () {
+      function daysUntil(dateStr) {
+        if (!dateStr) return null;
+        var end = new Date(dateStr + 'T23:59:59+09:00');
+        if (Number.isNaN(end.getTime())) return null;
+        return Math.ceil((end.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+      }
+
+      function deadlineLabel(b) {
+        if (b.alwaysOpen) return '상시';
+        var days = daysUntil(b.applyEnd);
+        if (days === null) return '공고 확인';
+        if (days < 0) return '마감';
+        if (days === 0) return 'D-Day';
+        return 'D-' + days;
+      }
+
+      function matches(b, region, category) {
+        if (region && region !== '전국' && b.region !== '전국' && b.region.indexOf(region) === -1) {
+          return false;
+        }
+        if (category && b.category !== category) return false;
+        return true;
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function chipClass(dday) {
+        if (dday.indexOf('D-') === 0 && Number(dday.slice(2)) <= 14) return 'chip chip--danger';
+        if (dday === '상시') return 'chip chip--ok';
+        return 'chip';
+      }
+
+      function renderRow(b) {
+        var dday = deadlineLabel(b);
+        return (
+          '<a class="benefit-row" href="/benefits/' +
+          encodeURIComponent(b.id) +
+          '/">' +
+          '<div><div class="benefit-row__meta">' +
+          '<span class="chip chip--amber">' +
+          escapeHtml(b.category) +
+          '</span>' +
+          '<span class="chip">' +
+          escapeHtml(b.region) +
+          '</span>' +
+          '<span class="chip">' +
+          escapeHtml(b.org) +
+          '</span></div>' +
+          '<h3>' +
+          escapeHtml(b.title) +
+          '</h3>' +
+          '<p class="benefit-row__summary">' +
+          escapeHtml(b.targetSummary) +
+          '</p></div>' +
+          '<div class="benefit-row__side">' +
+          '<span class="benefit-row__amount">' +
+          escapeHtml(b.maxBenefit) +
+          '</span>' +
+          '<span class="' +
+          chipClass(dday) +
+          '">' +
+          escapeHtml(dday) +
+          '</span></div></a>'
+        );
+      }
+
+      var dataEl = document.getElementById('find-data');
+      var benefits = JSON.parse((dataEl && dataEl.textContent) || '[]');
+      var regionEl = document.getElementById('find-region');
+      var resultsEl = document.getElementById('find-results');
+      var listEl = document.getElementById('find-list');
+      var countEl = document.getElementById('find-count');
+      var emptyEl = document.getElementById('find-empty');
+
+      var params = new URLSearchParams(window.location.search);
+      var region = params.get('region') || '';
+      var category = params.get('category') || '';
+
+      if (regionEl && region) regionEl.value = region;
+      if (category) {
+        var radio = document.querySelector('input[name="category"][value="' + category.replace(/"/g, '\\"') + '"]');
+        if (radio) radio.checked = true;
+      }
+
+      if (!region && !category) return;
+
+      var matched = benefits.filter(function (b) {
+        return matches(b, region, category);
+      });
+      if (countEl) countEl.textContent = String(matched.length);
+      if (listEl) listEl.innerHTML = matched.map(renderRow).join('');
+      if (emptyEl) emptyEl.hidden = matched.length > 0;
+      if (resultsEl) resultsEl.hidden = false;
+    })();
+  </script>
 </BaseLayout>

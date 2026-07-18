@@ -4,8 +4,9 @@
 /llms.txt
   Content-Type: text/plain; charset=utf-8
 
+# immutable 장캐시는 누락 자산이 HTML로 캐시되는 사고가 있어 짧게 유지
 /_astro/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=3600, must-revalidate
 
 /favicon.ico
   Cache-Control: public, max-age=604800

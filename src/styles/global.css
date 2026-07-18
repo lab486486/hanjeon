@@ -538,6 +538,10 @@ label.field input {
   }
 }
 
+.find-results {
+  margin-top: 2rem;
+}
+
 .quiz {
   display: grid;
   gap: 1rem;

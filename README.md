@@ -20,6 +20,18 @@ npm run dev
 
 공공서비스(혜택) API 키는 `.dev.vars`의 `ODCLOUD_SERVICE_KEY`(Decoding 키)에 넣습니다. 저장소에 커밋하지 마세요.
 
+### 주간 자동 동기화
+
+GitHub Actions (`.github/workflows/weekly-sync.yml`)가 **매주 월요일** 보조금24 API를 동기화하고 Cloudflare Pages에 배포합니다.
+
+Repository secrets:
+
+- `ODCLOUD_SERVICE_KEY` — data.go.kr Decoding 키
+- `CLOUDFLARE_API_TOKEN` — Pages 배포 권한
+- `CLOUDFLARE_ACCOUNT_ID` — `66b716eb6832b9626c866772cf2f3e11`
+
+수동 실행: Actions → **Weekly benefits sync** → Run workflow
+
 정적 페이지만 확인할 때는 `astro dev`로 충분합니다. OAuth/R2 Functions까지 보려면:
 
 ```bash

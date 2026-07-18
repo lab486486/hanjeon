@@ -1,15 +1,19 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import BenefitRow from '../../components/BenefitRow.astro';
-import { CATEGORIES, getPublishedBenefits, matchesFilters } from '../../lib/benefits';
+import { CATEGORIES, getPublishedBenefits } from '../../lib/benefits';
 
 const all = await getPublishedBenefits();
-const params = Astro.url.searchParams;
-const region = params.get('region') ?? '';
-const category = params.get('category') ?? '';
-const keyword = params.get('q') ?? '';
-
-const benefits = all.filter((b) => matchesFilters(b, { region, category, keyword }));
+const payload = all.map((b) => ({
+  id: b.id,
+  title: b.data.title,
+  org: b.data.org,
+  region: b.data.region,
+  category: b.data.category,
+  maxBenefit: b.data.maxBenefit,
+  targetSummary: b.data.targetSummary,
+  alwaysOpen: b.data.alwaysOpen,
+  applyEnd: b.data.applyEnd ?? '',
+}));
 const regions = [...new Set(all.map((b) => b.data.region))].sort();
 ---
 
@@ -19,49 +23,143 @@ const regions = [...new Set(all.map((b) => b.data.region))].sort();
       <div class="section__head">
         <div>
           <h2>혜택 목록</h2>
-          <p>{benefits.length}건 · 출처·확인일 기준 정리</p>
+          <p><span id="benefits-count">{payload.length}</span>건 · 출처·확인일 기준 정리</p>
         </div>
       </div>
 
-      <form class="filters" method="get" action="/benefits/">
+      <form class="filters" id="benefits-form" method="get" action="/benefits/">
         <div class="filters__row">
           <label class="field">
             지역
-            <select name="region">
+            <select name="region" id="benefits-region">
               <option value="">전체</option>
-              {regions.map((r) => <option value={r} selected={region === r}>{r}</option>)}
+              {regions.map((r) => <option value={r}>{r}</option>)}
             </select>
           </label>
           <label class="field">
             카테고리
-            <select name="category">
+            <select name="category" id="benefits-category">
               <option value="">전체</option>
-              {
-                CATEGORIES.map((c) => (
-                  <option value={c} selected={category === c}>
-                    {c}
-                  </option>
-                ))
-              }
+              {CATEGORIES.map((c) => <option value={c}>{c}</option>)}
             </select>
           </label>
           <label class="field">
             검색
-            <input type="search" name="q" value={keyword} placeholder="예: 복지할인, 바우처" />
+            <input type="search" name="q" id="benefits-q" placeholder="예: 복지할인, 바우처" />
           </label>
         </div>
         <button class="btn btn--dark" type="submit">필터 적용</button>
       </form>
 
-      <div class="benefit-list">
-        {
-          benefits.length > 0 ? (
-            benefits.map((benefit) => <BenefitRow benefit={benefit} />)
-          ) : (
-            <p class="notice">조건에 맞는 혜택이 없습니다. 필터를 넓혀 보세요.</p>
-          )
-        }
-      </div>
+      <div class="benefit-list" id="benefits-list"></div>
+      <p class="notice" id="benefits-empty" hidden>조건에 맞는 혜택이 없습니다. 필터를 넓혀 보세요.</p>
     </div>
   </section>
+
+  <script id="benefits-data" type="application/json" is:inline set:html={JSON.stringify(payload)} />
+
+  <script is:inline>
+    (function () {
+      function daysUntil(dateStr) {
+        if (!dateStr) return null;
+        var end = new Date(dateStr + 'T23:59:59+09:00');
+        if (Number.isNaN(end.getTime())) return null;
+        return Math.ceil((end.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+      }
+
+      function deadlineLabel(b) {
+        if (b.alwaysOpen) return '상시';
+        var days = daysUntil(b.applyEnd);
+        if (days === null) return '공고 확인';
+        if (days < 0) return '마감';
+        if (days === 0) return 'D-Day';
+        return 'D-' + days;
+      }
+
+      function matches(b, region, category, keyword) {
+        if (region && region !== '전국' && b.region !== '전국' && b.region.indexOf(region) === -1) {
+          return false;
+        }
+        if (category && b.category !== category) return false;
+        if (keyword) {
+          var hay = (b.title + ' ' + b.org + ' ' + b.targetSummary).toLowerCase();
+          if (hay.indexOf(keyword.toLowerCase()) === -1) return false;
+        }
+        return true;
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function chipClass(dday) {
+        if (dday.indexOf('D-') === 0 && Number(dday.slice(2)) <= 14) return 'chip chip--danger';
+        if (dday === '상시') return 'chip chip--ok';
+        return 'chip';
+      }
+
+      function renderRow(b) {
+        var dday = deadlineLabel(b);
+        return (
+          '<a class="benefit-row" href="/benefits/' +
+          encodeURIComponent(b.id) +
+          '/">' +
+          '<div><div class="benefit-row__meta">' +
+          '<span class="chip chip--amber">' +
+          escapeHtml(b.category) +
+          '</span>' +
+          '<span class="chip">' +
+          escapeHtml(b.region) +
+          '</span>' +
+          '<span class="chip">' +
+          escapeHtml(b.org) +
+          '</span></div>' +
+          '<h3>' +
+          escapeHtml(b.title) +
+          '</h3>' +
+          '<p class="benefit-row__summary">' +
+          escapeHtml(b.targetSummary) +
+          '</p></div>' +
+          '<div class="benefit-row__side">' +
+          '<span class="benefit-row__amount">' +
+          escapeHtml(b.maxBenefit) +
+          '</span>' +
+          '<span class="' +
+          chipClass(dday) +
+          '">' +
+          escapeHtml(dday) +
+          '</span></div></a>'
+        );
+      }
+
+      var dataEl = document.getElementById('benefits-data');
+      var benefits = JSON.parse((dataEl && dataEl.textContent) || '[]');
+      var regionEl = document.getElementById('benefits-region');
+      var categoryEl = document.getElementById('benefits-category');
+      var qEl = document.getElementById('benefits-q');
+      var listEl = document.getElementById('benefits-list');
+      var countEl = document.getElementById('benefits-count');
+      var emptyEl = document.getElementById('benefits-empty');
+
+      var params = new URLSearchParams(window.location.search);
+      var region = params.get('region') || '';
+      var category = params.get('category') || '';
+      var keyword = params.get('q') || '';
+
+      if (regionEl) regionEl.value = region;
+      if (categoryEl) categoryEl.value = category;
+      if (qEl) qEl.value = keyword;
+
+      var matched = benefits.filter(function (b) {
+        return matches(b, region, category, keyword);
+      });
+      if (countEl) countEl.textContent = String(matched.length);
+      if (listEl) listEl.innerHTML = matched.map(renderRow).join('');
+      if (emptyEl) emptyEl.hidden = matched.length > 0;
+    })();
+  </script>
 </BaseLayout>
