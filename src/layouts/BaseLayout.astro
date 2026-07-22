@@ -35,6 +35,8 @@ const nav = [
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="한전넷 지원금" href="/rss.xml" />
     <title>{fullTitle}</title>
   </head>
   <body>
@@ -64,8 +66,54 @@ const nav = [
             ))
           }
         </nav>
+        <button
+          class="menu-btn"
+          type="button"
+          id="menu-btn"
+          aria-expanded="false"
+          aria-controls="mobile-nav"
+          aria-label="메뉴 열기"
+        >
+          <span class="menu-btn__bars" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="mobile-nav" id="mobile-nav" hidden>
+        <div class="container mobile-nav__inner">
+          {
+            nav.map((item) => (
+              <a href={item.href} aria-current={path === item.href || (item.href !== '/' && path.startsWith(item.href)) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            ))
+          }
+        </div>
       </div>
     </header>
+
+    <script is:inline>
+      (function () {
+        var btn = document.getElementById('menu-btn');
+        var panel = document.getElementById('mobile-nav');
+        if (!btn || !panel) return;
+
+        function setOpen(open) {
+          panel.hidden = !open;
+          btn.setAttribute('aria-expanded', String(open));
+          btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+          btn.classList.toggle('is-open', open);
+          document.body.classList.toggle('nav-open', open);
+        }
+
+        btn.addEventListener('click', function () {
+          setOpen(panel.hidden);
+        });
+        panel.querySelectorAll('a').forEach(function (link) {
+          link.addEventListener('click', function () {
+            setOpen(false);
+          });
+        });
+      })();
+    </script>
 
     <main>
       <slot />
