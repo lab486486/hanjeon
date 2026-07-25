@@ -711,6 +711,16 @@ label.field input {
   word-break: keep-all;
 }
 
+.footer-brand {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.footer-brand:hover {
+  color: #c62828;
+}
+
 .footer-note {
   margin: 0;
   max-width: 42rem;

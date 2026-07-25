@@ -14,9 +14,20 @@ export async function getStaticPaths() {
 const { benefit } = Astro.props;
 const { Content } = await render(benefit);
 const dday = deadlineLabel(benefit);
+
+function metaDescription(text: string, max = 110) {
+  const cleaned = text.replace(/\s+/g, ' ').replace(/[〮·]+/g, ' ').trim();
+  if (cleaned.length <= max) return cleaned;
+  return `${cleaned.slice(0, max - 1).trim()}…`;
+}
+
+const pageTitle = `${benefit.data.title} 신청 안내`;
+const pageDescription = metaDescription(
+  `${benefit.data.title} 대상·지원금액·신청방법을 안내합니다. ${benefit.data.targetSummary}`,
+);
 ---
 
-<BaseLayout title={benefit.data.title} description={benefit.data.targetSummary} path="/benefits/">
+<BaseLayout title={pageTitle} description={pageDescription} path="/benefits/">
   <article class="detail-hero">
     <div class="container">
       <div class="benefit-row__meta">
