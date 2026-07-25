@@ -9,11 +9,13 @@ interface Props {
 
 const {
   title = '한전넷',
-  description = '전기요금·에너지 지원금을 모아 보는 비공식 안내 사이트',
+  description = '전기요금 지원금·소상공인 전기지원금·에너지바우처 신청·조회 정보를 모아 안내합니다.',
   path = Astro.url.pathname,
 } = Astro.props;
 
-const fullTitle = title === '한전넷' ? '한전넷 — 전기·에너지 지원금 안내' : `${title} | 한전넷`;
+// 키워드 선행: 네이버 연관검색(전기요금 지원금·신청) 기준, 브랜드는 뒤로
+const fullTitle =
+  title === '한전넷' ? '전기요금 지원금 신청 안내 | 한전넷' : `${title} | 한전넷`;
 const year = new Date().getFullYear();
 const nav = [
   { href: '/', label: '홈' },
@@ -36,7 +38,7 @@ const nav = [
     <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
-    <link rel="alternate" type="application/rss+xml" title="한전넷 지원금" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title="전기요금 지원금 | 한전넷" href="/rss.xml" />
     <title>{fullTitle}</title>
   </head>
   <body>
@@ -54,7 +56,7 @@ const nav = [
           />
           <span class="brand__text">
             <span class="brand__name">한전넷</span>
-            <span class="brand__tag">전기·에너지 지원금 안내</span>
+            <span class="brand__tag">전기요금 지원금 안내</span>
           </span>
         </a>
         <nav class="nav" aria-label="주요">

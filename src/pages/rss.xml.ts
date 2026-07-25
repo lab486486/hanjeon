@@ -7,8 +7,8 @@ export const GET: APIRoute = async (context) => {
   const site = context.site ?? new URL('https://hanjeon.net');
 
   return rss({
-    title: '한전넷 — 전기·에너지 지원금',
-    description: '신청 가능한 전기요금·에너지 지원금 안내',
+    title: '전기요금 지원금 안내 | 한전넷',
+    description: '전기요금 지원금·소상공인 전기지원금·에너지바우처 신청 안내',
     site,
     items: benefits.map((benefit) => ({
       title: benefit.data.title,
