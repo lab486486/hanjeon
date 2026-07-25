@@ -11,6 +11,39 @@ const closingSoon = benefits
     return d !== null && d >= 0 && d <= 45;
   })
   .slice(0, 5);
+
+const intentPaths = [
+  {
+    href: '/find/',
+    label: '전기요금 지원금 신청',
+    hint: '지역·유형으로 내게 맞는 지원 찾기',
+  },
+  {
+    href: '/guides/welfare-discount/',
+    label: '전기요금 복지할인',
+    hint: '수급·장애인·다자녀 등 할인 대상 요약',
+  },
+  {
+    href: '/guides/energy-voucher/',
+    label: '에너지바우처',
+    hint: '신청 기간·창구·서류 체크리스트',
+  },
+  {
+    href: '/benefits/?q=%EC%86%8C%EC%83%81%EA%B3%B5%EC%9D%B8',
+    label: '소상공인·자영업자 전기지원금',
+    hint: '사업자·영세 소상공인 관련 항목 모아보기',
+  },
+  {
+    href: '/benefits/?q=%EB%85%B8%EC%9D%B8',
+    label: '65세·노인 전기요금 지원',
+    hint: '고령층·독거노인 관련 지원 확인',
+  },
+  {
+    href: '/benefits/',
+    label: '전체 전기요금 지원금 목록',
+    hint: '출처·확인일이 있는 전체 목록',
+  },
+];
 ---
 
 <BaseLayout
@@ -23,25 +56,48 @@ const closingSoon = benefits
         <span class="hero__kicker">HANJEON.NET</span>
         <h1>한전넷</h1>
         <p class="hero__lead">
-          전기요금 할인, 에너지바우처, 공동전기료, 전기차 지원까지.<br class="hero__br" />
-          한전넷을 즐겨찾기 해놓고 편하게 확인하세요!
+          전기요금 지원금, 에너지바우처, 소상공인 전기지원금까지.<br class="hero__br" />
+          대상과 신청 방법을 한곳에서 빠르게 확인하세요.
         </p>
         <div class="hero__actions">
           <a class="btn btn--primary" href="/find/">신청 가능한 지원금 찾기</a>
-          <a class="btn btn--ghost" href="/benefits/">전체 목록 보기</a>
+          <a class="btn btn--ghost" href="/guides/">신청 가이드 보기</a>
         </div>
       </div>
 
-      <aside class="hero__aside" aria-label="생활비 아껴주는 분야">
-        <p class="hero__aside-label">💡 생활비 아껴주는 분야</p>
+      <aside class="hero__aside" aria-label="자주 찾는 지원">
+        <p class="hero__aside-label">자주 찾는 전기요금 지원</p>
         <div class="hero__shortcuts">
-          <a class="hero__shortcut" href="/benefits/?category=%EC%9A%94%EA%B8%88%ED%95%A0%EC%9D%B8">요금할인</a>
-          <a class="hero__shortcut" href="/benefits/?category=%EB%B0%94%EC%9A%B0%EC%B2%98">바우처</a>
-          <a class="hero__shortcut" href="/benefits/?category=%EA%B3%B5%EB%8F%99%EC%A0%84%EA%B8%B0%EB%A3%8C">공동전기료</a>
-          <a class="hero__shortcut" href="/benefits/?category=%EC%A0%84%EA%B8%B0%EC%B0%A8">전기차</a>
-          <a class="hero__shortcut hero__shortcut--accent" href="/find/">🔎 지원금 찾기</a>
+          <a class="hero__shortcut" href="/guides/welfare-discount/">복지할인</a>
+          <a class="hero__shortcut" href="/guides/energy-voucher/">에너지바우처</a>
+          <a class="hero__shortcut" href="/benefits/?q=%EC%86%8C%EC%83%81%EA%B3%B5%EC%9D%B8">소상공인</a>
+          <a class="hero__shortcut" href="/benefits/?q=%EB%85%B8%EC%9D%B8">65세·노인</a>
+          <a class="hero__shortcut hero__shortcut--accent" href="/find/">맞춤 지원금 찾기</a>
         </div>
       </aside>
+    </div>
+  </section>
+
+  <section class="section section--paths">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>어떤 전기요금 지원금을 찾으세요?</h2>
+          <p>전기요금 지원금·소상공인·에너지바우처처럼 자주 찾는 주제로 바로 이동합니다.</p>
+        </div>
+      </div>
+      <ul class="intent-paths">
+        {
+          intentPaths.map((item) => (
+            <li>
+              <a class="intent-path" href={item.href}>
+                <span class="intent-path__label">{item.label}</span>
+                <span class="intent-path__hint">{item.hint}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </section>
 
@@ -49,10 +105,10 @@ const closingSoon = benefits
     <div class="container">
       <div class="section__head">
         <div>
-          <h2><span class="mark-highlight">강력추천 지원금</span></h2>
-          <p>신청하지 않으면 받을 수 없는 지원금 List</p>
+          <h2><span class="mark-highlight">먼저 확인할 지원금</span></h2>
+          <p>신청하지 않으면 놓치기 쉬운 대표 전기요금·에너지 지원</p>
         </div>
-        <a href="/guides/">가이드 보기 →</a>
+        <a href="/benefits/">전체 목록 →</a>
       </div>
       <div class="benefit-list">
         {featured.map((benefit) => <BenefitRow benefit={benefit} />)}
@@ -80,4 +136,47 @@ const closingSoon = benefits
     )
   }
 
+  <section class="section section--faq">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>전기요금 지원금, 궁금한 점</h2>
+          <p>검색으로 들어온 분들이 가장 많이 묻는 내용만 짧게 정리했습니다.</p>
+        </div>
+      </div>
+      <div class="faq">
+        <details class="faq__item">
+          <summary>전기요금 지원금은 어디서 신청하나요?</summary>
+          <p>
+            지원마다 창구가 다릅니다. 복지할인은 한전ON·주민센터, 에너지바우처는 복지로·주민센터, 소상공인 지원은
+            소상공인24 등 사업 공고처를 확인해야 합니다.
+            <a href="/find/">맞춤 찾기로 대상부터 좁혀 보세요.</a>
+          </p>
+        </details>
+        <details class="faq__item">
+          <summary>소상공인·자영업자 전기지원금도 볼 수 있나요?</summary>
+          <p>
+            사업 공고가 열려 있는 항목은 목록에서 확인할 수 있습니다. 연도·매출 기준이 자주 바뀌므로
+            <a href="/benefits/?q=%EC%86%8C%EC%83%81%EA%B3%B5%EC%9D%B8">소상공인 관련 목록</a>과 원문 링크를 함께
+            확인하세요.
+          </p>
+        </details>
+        <details class="faq__item">
+          <summary>65세 이상·노인 가구도 전기요금 지원을 받을 수 있나요?</summary>
+          <p>
+            에너지바우처·복지할인·지역 안전점검 등 고령층이 포함되는 지원이 있습니다.
+            <a href="/benefits/?q=%EB%85%B8%EC%9D%B8">노인 관련 지원 목록</a>과
+            <a href="/guides/energy-voucher/">에너지바우처 가이드</a>를 먼저 보세요.
+          </p>
+        </details>
+        <details class="faq__item">
+          <summary>한전넷은 공식 신청 사이트인가요?</summary>
+          <p>
+            아닙니다. 한전넷은 한국전력·정부와 무관한 비공식 안내 사이트입니다. 자격·금액·신청은 반드시
+            보조금24·한전ON·소상공인24 등 원문에서 확인하세요.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
 </BaseLayout>

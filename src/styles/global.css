@@ -384,8 +384,95 @@ img {
   color: #fff;
 }
 
+.intent-paths {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.intent-path {
+  display: grid;
+  gap: 0.2rem;
+  padding: 1.05rem 0.15rem;
+  border-bottom: 1px solid var(--line);
+  transition: color 0.15s ease, padding-left 0.2s ease;
+}
+
+.intent-path:hover {
+  padding-left: 0.35rem;
+}
+
+.intent-path__label {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--navy-deep);
+}
+
+.intent-path:hover .intent-path__label {
+  color: #c62828;
+}
+
+.intent-path__hint {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.faq {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.faq__item {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.55);
+  padding: 0.15rem 1rem;
+}
+
+.faq__item summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.95rem 0;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--navy-deep);
+}
+
+.faq__item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq__item summary::after {
+  content: '+';
+  float: right;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.faq__item[open] summary::after {
+  content: '−';
+}
+
+.faq__item p {
+  margin: 0 0 1rem;
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
+
+.faq__item a {
+  color: var(--amber-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .section {
   padding: 2.25rem 0;
+}
+
+.section--paths {
+  padding-top: 0.5rem;
 }
 
 .section__head {
