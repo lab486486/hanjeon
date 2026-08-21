@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <title>한전넷 CMS</title>
+    <style>
+      /* 분할 미리보기 제거 후 편집 영역을 최대한 넓게 */
+      [class*='Pane'],
+      [class*='ControlPane'],
+      [class*='EditorControlPane'],
+      [class*='ControlPaneContainer'],
+      [class*='EntryEditor'] {
+        max-width: none !important;
+      }
+      [class*='ControlPaneContainer'],
+      [class*='ControlPane'] {
+        width: 100% !important;
+      }
+    </style>
   </head>
   <body>
     <script src="https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js"></script>

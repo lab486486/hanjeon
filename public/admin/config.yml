@@ -9,6 +9,13 @@ backend:
 
 local_backend: false
 
+# 글쓰기 창을 넓히기 위해 분할 미리보기 패널 비활성화
+# 미리보기는 툴바의 '사이트에서 보기' 링크로 대체 (site_url + preview_path)
+site_url: https://hanjeon.net
+show_preview_links: true
+editor:
+  preview: false
+
 media_library:
   name: r2
 
@@ -29,6 +36,7 @@ collections:
     slug: "{{slug}}"
     extension: md
     format: yaml-frontmatter
+    preview_path: "benefits/{{slug}}/"
     fields:
       - { label: 제목, name: title, widget: string }
       - { label: 기관, name: org, widget: string }
@@ -67,6 +75,7 @@ collections:
     slug: "{{slug}}"
     extension: md
     format: yaml-frontmatter
+    preview_path: "guides/{{slug}}/"
     fields:
       - { label: 제목, name: title, widget: string }
       - { label: 설명, name: description, widget: string }
