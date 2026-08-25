@@ -51,7 +51,7 @@
 
       .toast-markdown-host {
         width: 100%;
-        min-height: calc(100vh - 200px);
+        min-height: 420px;
       }
 
       .toast-markdown-host .toastui-editor-defaultUI {
@@ -166,7 +166,7 @@
           this.destroyEditor();
           this.hostEl.innerHTML = '';
 
-          var height = Math.max(420, window.innerHeight - 200) + 'px';
+          var height = '420px';
 
           this.editor = new toastui.Editor({
             el: this.hostEl,
@@ -199,7 +199,7 @@
 
           var onResize = function () {
             if (!self.editor) return;
-            var nextHeight = Math.max(420, window.innerHeight - 200) + 'px';
+            var nextHeight = '420px';
             self.editor.setHeight(nextHeight);
           };
           this._onResize = onResize;
