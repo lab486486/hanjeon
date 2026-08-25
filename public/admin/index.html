@@ -5,22 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <title>한전넷 CMS</title>
+    <link
+      rel="stylesheet"
+      href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"
+    />
     <style>
-      /* 분할 미리보기 제거 후 편집 영역을 최대한 넓게 */
+      html,
+      body {
+        margin: 0;
+      }
+
+      /* 분할 미리보기 제거 + 가로 여백 최소화 */
       [class*='Pane'],
       [class*='ControlPane'],
       [class*='EditorControlPane'],
       [class*='ControlPaneContainer'],
-      [class*='EntryEditor'] {
+      [class*='EntryEditor'],
+      [class*='EntryEditorContent'],
+      [class*='AppMainContainer'],
+      [class*='AppHeaderContent'],
+      [class*='CollectionTopContainer'] {
         max-width: none !important;
       }
+
       [class*='ControlPaneContainer'],
-      [class*='ControlPane'] {
+      [class*='ControlPane'],
+      [class*='EntryEditorContent'] {
         width: 100% !important;
+      }
+
+      [class*='ControlPaneContainer'],
+      [class*='EntryEditorContent'],
+      [class*='ControlContainer'] {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+      }
+
+      /* 본문 Toast 에디터: 가로 풀폭 + 세로 고정(내부 스크롤) */
+      .toast-markdown-widget {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+      }
+
+      .toast-markdown-host {
+        width: 100%;
+        min-height: calc(100vh - 200px);
+      }
+
+      .toast-markdown-host .toastui-editor-defaultUI {
+        border-radius: 8px;
+      }
+
+      .toast-markdown-host .toastui-editor-main,
+      .toast-markdown-host .toastui-editor-md-container,
+      .toast-markdown-host .toastui-editor-ww-container {
+        background: #fff;
       }
     </style>
   </head>
   <body>
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script src="https://uicdn.toast.com/editor/latest/i18n/ko-kr.min.js"></script>
     <script src="https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js"></script>
     <script>
       CMS.registerMediaLibrary({
@@ -68,6 +115,124 @@
           };
         },
       });
+
+      async function uploadImageBlob(blob) {
+        const form = new FormData();
+        form.append('file', blob, blob.name || 'image.png');
+        const res = await fetch('/api/media', { method: 'POST', body: form });
+        if (!res.ok) {
+          throw new Error(await res.text());
+        }
+        const data = await res.json();
+        return data.url;
+      }
+
+      var ToastMarkdownControl = createClass({
+        editor: null,
+        hostEl: null,
+        syncing: false,
+
+        componentDidMount: function () {
+          this.mountEditor();
+        },
+
+        componentDidUpdate: function (prevProps) {
+          if (!this.editor) return;
+          var next = this.props.value || '';
+          var prev = prevProps.value || '';
+          if (next === prev) return;
+          var current = this.editor.getMarkdown();
+          if (next !== current) {
+            this.syncing = true;
+            this.editor.setMarkdown(next, false);
+            this.syncing = false;
+          }
+        },
+
+        destroyEditor: function () {
+          if (this.editor) {
+            this.editor.destroy();
+            this.editor = null;
+          }
+        },
+
+        mountEditor: function () {
+          var self = this;
+          if (!this.hostEl || !window.toastui || !window.toastui.Editor) {
+            console.error('Toast UI Editor를 불러오지 못했습니다.');
+            return;
+          }
+
+          this.destroyEditor();
+          this.hostEl.innerHTML = '';
+
+          var height = Math.max(420, window.innerHeight - 200) + 'px';
+
+          this.editor = new toastui.Editor({
+            el: this.hostEl,
+            height: height,
+            initialEditType: 'markdown',
+            // 세로로 늘리지 않고, 좌(마크다운)·우(미리보기)로 가로 활용
+            previewStyle: 'vertical',
+            hideModeSwitch: false,
+            usageStatistics: false,
+            language: 'ko-KR',
+            autofocus: false,
+            initialValue: this.props.value || '',
+            hooks: {
+              addImageBlobHook: function (blob, callback) {
+                uploadImageBlob(blob)
+                  .then(function (url) {
+                    callback(url, 'image');
+                  })
+                  .catch(function (err) {
+                    alert('이미지 업로드 실패: ' + (err && err.message ? err.message : err));
+                  });
+              },
+            },
+          });
+
+          this.editor.on('change', function () {
+            if (self.syncing || !self.editor) return;
+            self.props.onChange(self.editor.getMarkdown());
+          });
+
+          var onResize = function () {
+            if (!self.editor) return;
+            var nextHeight = Math.max(420, window.innerHeight - 200) + 'px';
+            self.editor.setHeight(nextHeight);
+          };
+          this._onResize = onResize;
+          window.addEventListener('resize', onResize);
+        },
+
+        componentWillUnmount: function () {
+          if (this._onResize) {
+            window.removeEventListener('resize', this._onResize);
+            this._onResize = null;
+          }
+          this.destroyEditor();
+        },
+
+        render: function () {
+          var self = this;
+          return h(
+            'div',
+            {
+              id: this.props.forID,
+              className: (this.props.classNameWrapper || '') + ' toast-markdown-widget',
+            },
+            h('div', {
+              className: 'toast-markdown-host',
+              ref: function (node) {
+                self.hostEl = node;
+              },
+            }),
+          );
+        },
+      });
+
+      CMS.registerWidget('toast-markdown', ToastMarkdownControl);
     </script>
   </body>
 </html>

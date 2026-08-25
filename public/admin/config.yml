@@ -65,7 +65,7 @@ collections:
       - { label: API 동기화, name: synced, widget: boolean, default: false }
       - { label: 핵심 노출, name: featured, widget: boolean, default: false }
       - { label: 초안, name: draft, widget: boolean, default: false }
-      - { label: 본문, name: body, widget: markdown }
+      - { label: 본문, name: body, widget: toast-markdown }
 
   - name: guides
     label: 가이드
@@ -81,4 +81,4 @@ collections:
       - { label: 설명, name: description, widget: string }
       - { label: 정렬, name: order, widget: number, default: 99 }
       - { label: 업데이트, name: updatedAt, widget: string }
-      - { label: 본문, name: body, widget: markdown }
+      - { label: 본문, name: body, widget: toast-markdown }
