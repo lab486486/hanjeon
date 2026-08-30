@@ -26,12 +26,11 @@ slug:
   clean_accents: true
   sanitize_replacement: "-"
 
-# blogincome UX 정렬용 공통 본문 위젯 옵션
+# hometax UX 정렬용 공통 본문 위젯 옵션 (hint 없음)
 x-body-field: &body_field
   label: 본문
   name: body
   widget: tui-markdown
-  hint: "Toast UI 에디터로 작성합니다."
   height: 420px
   initial_edit_type: wysiwyg
   preview_style: tab
@@ -55,7 +54,6 @@ collections:
         date_format: YYYY-MM-DD
         time_format: false
         default: "{{now}}"
-        hint: "기본값은 오늘입니다. 클릭해서 바꿀 수 있습니다."
       - { label: 대상 요약, name: targetSummary, widget: text }
       - { label: 기관, name: org, widget: string }
       - { label: 지역, name: region, widget: string, default: 전국 }
@@ -101,7 +99,6 @@ collections:
         date_format: YYYY-MM-DD
         time_format: false
         default: "{{now}}"
-        hint: "기본값은 오늘입니다. 클릭해서 바꿀 수 있습니다."
       - { label: 설명, name: description, widget: text }
       - { label: 정렬, name: order, widget: number, default: 99 }
       - *body_field
