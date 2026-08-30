@@ -9,10 +9,9 @@ backend:
 
 local_backend: false
 
-# 글쓰기 창을 넓히기 위해 분할 미리보기 패널 비활성화
-# 미리보기는 툴바의 '사이트에서 보기' 링크로 대체 (site_url + preview_path)
 site_url: https://hanjeon.net
 show_preview_links: true
+# 기본 분할 미리보기 off → cms-preview-default.js 의 「미리보기」 토글(모달) 사용
 editor:
   preview: false
 
@@ -27,6 +26,16 @@ slug:
   clean_accents: true
   sanitize_replacement: "-"
 
+# blogincome UX 정렬용 공통 본문 위젯 옵션
+x-body-field: &body_field
+  label: 본문
+  name: body
+  widget: tui-markdown
+  hint: "Toast UI 에디터로 작성합니다."
+  height: 420px
+  initial_edit_type: wysiwyg
+  preview_style: tab
+
 collections:
   - name: benefits
     label: 혜택/지원금
@@ -39,6 +48,15 @@ collections:
     preview_path: "benefits/{{slug}}/"
     fields:
       - { label: 제목, name: title, widget: string }
+      - label: 확인일
+        name: verifiedAt
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        default: "{{now}}"
+        hint: "기본값은 오늘입니다. 클릭해서 바꿀 수 있습니다."
+      - { label: 대상 요약, name: targetSummary, widget: text }
       - { label: 기관, name: org, widget: string }
       - { label: 지역, name: region, widget: string, default: 전국 }
       - label: 카테고리
@@ -53,19 +71,17 @@ collections:
           - 시설지원
           - 기타
       - { label: 최대 지원, name: maxBenefit, widget: string, default: 확인 필요 }
-      - { label: 대상 요약, name: targetSummary, widget: string }
       - { label: 지원성별, name: gender, widget: string, default: 제한없음 }
       - { label: 신청 시작일, name: applyStart, widget: string, required: false }
       - { label: 신청 종료일, name: applyEnd, widget: string, required: false }
       - { label: 상시 모집, name: alwaysOpen, widget: boolean, default: false }
       - { label: 원문 URL, name: sourceUrl, widget: string }
       - { label: 출처명, name: sourceName, widget: string, default: 보조금24 }
-      - { label: 확인일, name: verifiedAt, widget: string }
       - { label: 서비스ID, name: serviceId, widget: string, required: false }
       - { label: API 동기화, name: synced, widget: boolean, default: false }
       - { label: 핵심 노출, name: featured, widget: boolean, default: false }
       - { label: 초안, name: draft, widget: boolean, default: false }
-      - { label: 본문, name: body, widget: toast-markdown }
+      - *body_field
 
   - name: guides
     label: 가이드
@@ -78,7 +94,14 @@ collections:
     preview_path: "guides/{{slug}}/"
     fields:
       - { label: 제목, name: title, widget: string }
-      - { label: 설명, name: description, widget: string }
+      - label: 날짜
+        name: updatedAt
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        default: "{{now}}"
+        hint: "기본값은 오늘입니다. 클릭해서 바꿀 수 있습니다."
+      - { label: 설명, name: description, widget: text }
       - { label: 정렬, name: order, widget: number, default: 99 }
-      - { label: 업데이트, name: updatedAt, widget: string }
-      - { label: 본문, name: body, widget: toast-markdown }
+      - *body_field

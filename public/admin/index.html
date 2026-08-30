@@ -9,98 +9,73 @@
       rel="stylesheet"
       href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"
     />
-    <style>
-      html,
-      body {
-        margin: 0;
-      }
-
-      /* 분할 미리보기 제거 + 가로 여백 최소화 */
-      [class*='Pane'],
-      [class*='ControlPane'],
-      [class*='EditorControlPane'],
-      [class*='ControlPaneContainer'],
-      [class*='EntryEditor'],
-      [class*='EntryEditorContent'],
-      [class*='AppMainContainer'],
-      [class*='AppHeaderContent'],
-      [class*='CollectionTopContainer'] {
-        max-width: none !important;
-      }
-
-      [class*='ControlPaneContainer'],
-      [class*='ControlPane'],
-      [class*='EntryEditorContent'] {
-        width: 100% !important;
-      }
-
-      [class*='ControlPaneContainer'],
-      [class*='EntryEditorContent'],
-      [class*='ControlContainer'] {
-        padding-left: 0.75rem !important;
-        padding-right: 0.75rem !important;
-      }
-
-      /* 본문 Toast 에디터: 가로 풀폭 + 세로 고정(내부 스크롤) */
-      .toast-markdown-widget {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        max-width: none !important;
-      }
-
-      .toast-markdown-host {
-        width: 100%;
-        min-height: 420px;
-      }
-
-      .toast-markdown-host .toastui-editor-defaultUI {
-        border-radius: 8px;
-      }
-
-      .toast-markdown-host .toastui-editor-main,
-      .toast-markdown-host .toastui-editor-md-container,
-      .toast-markdown-host .toastui-editor-ww-container {
-        background: #fff;
-      }
-    </style>
+    <link href="/admin/cms-tui-editor.css?v=1" rel="stylesheet" />
+    <link href="/admin/admin-custom.css?v=1" rel="stylesheet" />
+    <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
+    <script>
+      window.CMS_MANUAL_INIT = true;
+      try {
+        localStorage.setItem("cms.preview-visible", "false");
+      } catch (e) {}
+      (function () {
+        if (window.__decapDomPatch) return;
+        window.__decapDomPatch = true;
+        var origRemove = Node.prototype.removeChild;
+        Node.prototype.removeChild = function (child) {
+          if (child && child.parentNode === this) {
+            return origRemove.call(this, child);
+          }
+          return child;
+        };
+        var origInsert = Node.prototype.insertBefore;
+        Node.prototype.insertBefore = function (newNode, ref) {
+          try {
+            return origInsert.call(this, newNode, ref);
+          } catch (e) {
+            if (e.name === "NotFoundError") return this.appendChild(newNode);
+            throw e;
+          }
+        };
+      })();
+    </script>
   </head>
   <body>
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <script src="https://uicdn.toast.com/editor/latest/i18n/ko-kr.min.js"></script>
-    <script src="https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js"></script>
+    <script src="https://unpkg.com/decap-cms@3.4.0/dist/decap-cms.js"></script>
+    <script src="/admin/cms-tui-editor.js?v=1"></script>
     <script>
       CMS.registerMediaLibrary({
-        name: 'r2',
+        name: "r2",
         config: {},
         init({ handleInsert } = {}) {
-          const input = document.createElement('input');
-          input.type = 'file';
-          input.accept = 'image/*';
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = "image/*";
           input.hidden = true;
           document.body.appendChild(input);
 
-          input.addEventListener('change', async () => {
+          input.addEventListener("change", async () => {
             const file = input.files && input.files[0];
-            input.value = '';
+            input.value = "";
             if (!file) return;
 
             const form = new FormData();
-            form.append('file', file);
+            form.append("file", file);
 
             try {
-              const res = await fetch('/api/media', {
-                method: 'POST',
+              const res = await fetch("/api/media", {
+                method: "POST",
                 body: form,
               });
               if (!res.ok) {
-                alert('업로드 실패: ' + (await res.text()));
+                alert("업로드 실패: " + (await res.text()));
                 return;
               }
               const data = await res.json();
               handleInsert(data.url);
             } catch (err) {
-              alert('업로드 오류: ' + (err && err.message ? err.message : err));
+              alert("업로드 오류: " + (err && err.message ? err.message : err));
             }
           });
 
@@ -116,123 +91,10 @@
         },
       });
 
-      async function uploadImageBlob(blob) {
-        const form = new FormData();
-        form.append('file', blob, blob.name || 'image.png');
-        const res = await fetch('/api/media', { method: 'POST', body: form });
-        if (!res.ok) {
-          throw new Error(await res.text());
-        }
-        const data = await res.json();
-        return data.url;
-      }
-
-      var ToastMarkdownControl = createClass({
-        editor: null,
-        hostEl: null,
-        syncing: false,
-
-        componentDidMount: function () {
-          this.mountEditor();
-        },
-
-        componentDidUpdate: function (prevProps) {
-          if (!this.editor) return;
-          var next = this.props.value || '';
-          var prev = prevProps.value || '';
-          if (next === prev) return;
-          var current = this.editor.getMarkdown();
-          if (next !== current) {
-            this.syncing = true;
-            this.editor.setMarkdown(next, false);
-            this.syncing = false;
-          }
-        },
-
-        destroyEditor: function () {
-          if (this.editor) {
-            this.editor.destroy();
-            this.editor = null;
-          }
-        },
-
-        mountEditor: function () {
-          var self = this;
-          if (!this.hostEl || !window.toastui || !window.toastui.Editor) {
-            console.error('Toast UI Editor를 불러오지 못했습니다.');
-            return;
-          }
-
-          this.destroyEditor();
-          this.hostEl.innerHTML = '';
-
-          var height = '420px';
-
-          this.editor = new toastui.Editor({
-            el: this.hostEl,
-            height: height,
-            initialEditType: 'markdown',
-            // 세로로 늘리지 않고, 좌(마크다운)·우(미리보기)로 가로 활용
-            previewStyle: 'vertical',
-            hideModeSwitch: false,
-            usageStatistics: false,
-            language: 'ko-KR',
-            autofocus: false,
-            initialValue: this.props.value || '',
-            hooks: {
-              addImageBlobHook: function (blob, callback) {
-                uploadImageBlob(blob)
-                  .then(function (url) {
-                    callback(url, 'image');
-                  })
-                  .catch(function (err) {
-                    alert('이미지 업로드 실패: ' + (err && err.message ? err.message : err));
-                  });
-              },
-            },
-          });
-
-          this.editor.on('change', function () {
-            if (self.syncing || !self.editor) return;
-            self.props.onChange(self.editor.getMarkdown());
-          });
-
-          var onResize = function () {
-            if (!self.editor) return;
-            var nextHeight = '420px';
-            self.editor.setHeight(nextHeight);
-          };
-          this._onResize = onResize;
-          window.addEventListener('resize', onResize);
-        },
-
-        componentWillUnmount: function () {
-          if (this._onResize) {
-            window.removeEventListener('resize', this._onResize);
-            this._onResize = null;
-          }
-          this.destroyEditor();
-        },
-
-        render: function () {
-          var self = this;
-          return h(
-            'div',
-            {
-              id: this.props.forID,
-              className: (this.props.classNameWrapper || '') + ' toast-markdown-widget',
-            },
-            h('div', {
-              className: 'toast-markdown-host',
-              ref: function (node) {
-                self.hostEl = node;
-              },
-            }),
-          );
-        },
-      });
-
-      CMS.registerWidget('toast-markdown', ToastMarkdownControl);
+      CMS.registerWidget("tui-markdown", window.TuiMarkdownControl, window.TuiMarkdownPreview);
+      CMS.init();
     </script>
+    <script src="/admin/cms-preview-default.js?v=1"></script>
+    <script src="/admin/cms-blog-form-layout.js?v=1"></script>
   </body>
 </html>
