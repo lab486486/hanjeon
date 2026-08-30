@@ -2,8 +2,9 @@ backend:
   name: github
   repo: lab486486/hanjeon
   branch: main
-  # DNS 연결 전에는 pages.dev, hanjeon.net 연결 후 이 값을 https://hanjeon.net 으로 바꾸세요
-  base_url: https://hanjeon.pages.dev
+  # GitHub OAuth App Authorization callback URL 과 동일 origin 이어야 함
+  # → https://hanjeon.net/api/callback
+  base_url: https://hanjeon.net
   auth_endpoint: api/auth
   cms_label_prefix: hanjeon
 
