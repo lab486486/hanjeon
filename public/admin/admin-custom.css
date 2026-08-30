@@ -97,6 +97,13 @@ html, body { margin: 0; }
   pointer-events: none !important;
 }
 
+#nc-root aside .cms-coupang-nav-row,
+#nc-root [class*="Sidebar"] .cms-coupang-nav-row {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 #nc-root aside .cms-sidebar-divider,
 #nc-root [class*="Sidebar"] .cms-sidebar-divider {
   height: 0 !important;

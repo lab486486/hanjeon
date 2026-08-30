@@ -1,6 +1,9 @@
 /**
  * Reorder Decap CMS sidebar into three groups with dividers:
  * 1) Site settings  2) Monetization  3) Content collections
+ *
+ * Only mutates the list when order actually changed. Repeated appendChild
+ * on every MutationObserver tick detaches React Router links and clicks do nothing.
  */
 (function () {
   var GROUPS = [
@@ -30,6 +33,7 @@
   var started = false;
   var pending = false;
   var applying = false;
+  var observer = null;
 
   function getRoot() {
     return document.getElementById("nc-root") || document.body;
@@ -41,7 +45,7 @@
 
   function findCollectionLink(sidebar, name) {
     var byData = sidebar.querySelector('a.cms-collection-link[data-collection="' + name + '"]');
-    if (byData) return byData;
+    if (byData && !byData.classList.contains("cms-coupang-nav")) return byData;
     var links = sidebar.querySelectorAll('a[href^="#/collections/"]');
     for (var i = 0; i < links.length; i++) {
       var href = links[i].getAttribute("href") || "";
@@ -87,6 +91,14 @@
     return row;
   }
 
+  function sameNodeList(a, b) {
+    if (a.length !== b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
+
   function applyOrder() {
     if (applying) return;
     var root = getRoot();
@@ -97,6 +109,7 @@
     if (!list) return;
 
     applying = true;
+    if (observer) observer.disconnect();
     try {
       var orderedRows = [];
       var seen = new Set();
@@ -111,8 +124,10 @@
         group.items.forEach(function (item) {
           var link = findLink(sidebar, item);
           var row = rowOf(link);
-          if (!row || row.parentElement !== list) return;
-          if (seen.has(row)) return;
+          if (!row || (row.parentElement && row.parentElement !== list && !list.contains(row))) {
+            return;
+          }
+          if (!row || seen.has(row)) return;
           orderedRows.push(row);
           seen.add(row);
         });
@@ -120,24 +135,68 @@
 
       if (orderedRows.length < 2) return;
 
-      orderedRows.forEach(function (row) {
-        list.appendChild(row);
-      });
-
       list.querySelectorAll("[data-cms-sidebar-divider]").forEach(function (row) {
         if (!seen.has(row)) row.remove();
       });
+
+      var extras = [];
+      Array.prototype.forEach.call(list.children, function (child) {
+        if (!seen.has(child)) extras.push(child);
+      });
+
+      var desired = orderedRows.concat(extras);
+      var current = Array.prototype.slice.call(list.children);
+      if (sameNodeList(current, desired)) return;
+
+      desired.forEach(function (row) {
+        if (row.parentElement !== list && row.parentElement) {
+          list.appendChild(row);
+        } else {
+          list.appendChild(row);
+        }
+      });
     } finally {
       applying = false;
+      if (observer) {
+        observer.observe(getRoot(), { childList: true, subtree: true });
+      }
     }
   }
 
+  function bindHashNavigation(sidebar) {
+    if (sidebar.dataset.cmsSidebarHashNav === "1") return;
+    sidebar.dataset.cmsSidebarHashNav = "1";
+    sidebar.addEventListener(
+      "click",
+      function (event) {
+        var a = event.target && event.target.closest ? event.target.closest("a") : null;
+        if (!a || !sidebar.contains(a)) return;
+        if (a.classList.contains("cms-coupang-nav")) return;
+        var href = a.getAttribute("href") || "";
+        if (!/^#\/collections\/[^/?#]+\/?$/.test(href)) {
+          var name = a.getAttribute("data-collection") || "";
+          if (!name || name === "coupang") return;
+          href = "#/collections/" + name;
+        }
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        event.stopPropagation();
+        if (location.hash !== href) {
+          location.hash = href;
+        }
+      },
+      true,
+    );
+  }
+
   function schedule() {
-    if (pending) return;
+    if (pending || applying) return;
     pending = true;
     window.requestAnimationFrame(function () {
       pending = false;
       applyOrder();
+      var sidebar = getSidebar(getRoot());
+      if (sidebar) bindHashNavigation(sidebar);
     });
   }
 
@@ -145,7 +204,7 @@
     if (started) return;
     started = true;
     var root = getRoot();
-    var observer = new MutationObserver(function () {
+    observer = new MutationObserver(function () {
       if (applying) return;
       schedule();
     });

@@ -238,6 +238,9 @@
 
       link.classList.add("cms-collection-link");
       link.dataset.collection = collection;
+      if (!href || href === "#") {
+        link.setAttribute("href", "#/collections/" + collection);
+      }
 
       // Drop Decap's built-in icon nodes so only our fixed-width slot remains.
       Array.from(link.children).forEach(function (child) {

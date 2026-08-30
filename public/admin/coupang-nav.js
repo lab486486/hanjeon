@@ -81,14 +81,27 @@
     link.rel = "noopener";
     link.title = "쿠팡파트너스 API Key 설정";
 
-    // Place above shortlinks (or adsense) so it sits near monetization tools.
+    const sampleRow = sample.closest("li") || sample.parentElement;
+    const list = sampleRow && sampleRow.parentElement;
+    if (!list) return;
+
+    let row = link.closest("li");
+    const nestedInCollection =
+      link.parentElement === sample.parentElement && sample.tagName === "A";
+    if (!row || nestedInCollection) {
+      row = document.createElement(sampleRow.tagName === "LI" ? "LI" : "DIV");
+      row.className = "cms-coupang-nav-row";
+      row.appendChild(link);
+    }
+
     const anchor = shortlinks || adsense;
-    if (anchor && anchor.parentElement === sample.parentElement) {
-      if (link.nextElementSibling !== anchor) {
-        anchor.parentElement.insertBefore(link, anchor);
+    const anchorRow = anchor ? anchor.closest("li") || anchor.parentElement : null;
+    if (anchorRow && anchorRow.parentElement === list) {
+      if (row.nextElementSibling !== anchorRow) {
+        list.insertBefore(row, anchorRow);
       }
-    } else if (!link.isConnected) {
-      sample.parentElement.insertBefore(link, sample);
+    } else if (row.parentElement !== list) {
+      list.insertBefore(row, sampleRow);
     }
   }
 
