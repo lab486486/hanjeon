@@ -16,6 +16,9 @@ const {
 // 키워드 선행: 네이버 연관검색(전기요금 지원금·신청) 기준, 브랜드는 뒤로
 const fullTitle =
   title === '한전넷' ? '전기요금 지원금 신청 안내 | 한전넷' : `${title} | 한전넷`;
+const siteOrigin = Astro.site?.origin ?? 'https://hanjeon.net';
+const canonicalUrl = new URL(path || '/', siteOrigin).toString();
+const ogImageUrl = new URL('/og.jpg', siteOrigin).toString();
 const year = new Date().getFullYear();
 const nav = [
   { href: '/', label: '홈' },
@@ -33,6 +36,22 @@ const nav = [
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
     <meta name="theme-color" content="#f7f4ef" />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="한전넷" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="960" />
+    <meta property="og:image:height" content="540" />
+    <meta property="og:image:alt" content="전기요금 지원금 신청안내 — 한전넷" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
