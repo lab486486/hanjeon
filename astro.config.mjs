@@ -4,6 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { adsense } from './src/integrations/adsense.ts';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -34,5 +35,6 @@ export default defineConfig({
       filter: (page) => !page.includes('/admin'),
     }),
     tagStats(),
+    adsense(),
   ],
 });

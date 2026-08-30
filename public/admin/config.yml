@@ -37,6 +37,146 @@ x-body-field: &body_field
   preview_style: tab
 
 collections:
+  - name: site
+    label: 사이트 설정
+    files:
+      - name: general
+        label: 사이트 상세 설정하기
+        file: src/data/site.json
+        format: json
+        fields:
+          - label: 사이트 제목
+            name: title
+            widget: string
+            hint: "상단 로고·브라우저 탭 제목에 표시됩니다."
+          - label: 사이트 주소
+            name: site_url
+            widget: string
+            hint: "이 주소를 변경해도 사이트 설정에는 영향이 없습니다."
+          - label: 카피라이트 이름
+            name: copyright_name
+            widget: string
+            hint: "하단 © 옆에 표시되는 이름입니다. 클릭하면 사이트 주소로 이동합니다."
+
+      - name: google_search_console
+        label: 구글 서치콘솔
+        file: src/data/site/google-search-console.json
+        format: json
+        fields:
+          - label: 소유권 확인 코드
+            name: code
+            widget: text
+            required: false
+            hint: "Search Console → HTML 태그 방식의 meta 태그 전체 또는 content 값을 입력하세요."
+
+      - name: naver_search_advisor
+        label: 네이버 서치어드바이저
+        file: src/data/site/naver-search-advisor.json
+        format: json
+        fields:
+          - label: 소유권 확인 코드
+            name: code
+            widget: text
+            required: false
+            hint: "서치어드바이저 → HTML 태그의 meta 태그 전체 또는 content 값을 입력하세요."
+
+      - name: bing_webmaster
+        label: 빙 웹마스터도구
+        file: src/data/site/bing-webmaster.json
+        format: json
+        fields:
+          - label: 소유권 확인 코드
+            name: code
+            widget: text
+            required: false
+            hint: "Bing Webmaster → meta 태그 전체 또는 content 값을 입력하세요."
+
+      - name: daum_webmaster
+        label: 다음 웹마스터 도구
+        file: src/data/site/daum-webmaster.json
+        format: json
+        fields:
+          - label: 소유권 확인 코드
+            name: code
+            widget: text
+            required: false
+            hint: "Daum 웹마스터 → meta 태그 전체 또는 content 값을 입력하세요."
+
+      - name: analytics
+        label: 애널리틱스
+        file: src/data/site/analytics.json
+        format: json
+        fields:
+          - label: 추적 코드
+            name: code
+            widget: text
+            required: false
+            hint: "Google Analytics gtag.js script 태그 전체 또는 측정 ID(G-XXXXXXXX)를 입력하세요."
+
+  - name: nav
+    label: 상단메뉴 설정
+    files:
+      - name: main
+        label: 상단메뉴 설정하기
+        file: src/data/nav.json
+        format: json
+        fields:
+          - label: 상단 메뉴
+            name: nav
+            widget: list
+            hint: "홈 또는 직접 URL로 상단 메뉴를 구성합니다."
+            fields:
+              - label: 메뉴 이름
+                name: label
+                widget: string
+              - label: 연결 유형
+                name: type
+                widget: select
+                options:
+                  - { label: "홈", value: "home" }
+                  - { label: "직접URL", value: "url" }
+              - label: URL
+                name: value
+                widget: string
+                required: false
+                hint: "직접URL일 때: /find/ 또는 https://... 전체 주소."
+
+  - name: adsense
+    label: 애드센스 설정
+    files:
+      - name: enabled
+        label: 광고 활성화
+        file: src/data/adsense/enabled.json
+        format: json
+        fields:
+          - label: 애드센스 사용
+            name: enabled
+            widget: boolean
+            default: true
+            hint: "끄면 head script가 삽입되지 않습니다. ads.txt는 유지됩니다."
+
+      - name: head_script
+        label: 애드센스 코드 입력
+        file: src/data/adsense/head-script.json
+        format: json
+        fields:
+          - label: 기본 script 코드
+            name: script
+            widget: text
+            required: false
+            hint: "AdSense → 코드 가져오기 → 사이트 전체 태그의 script를 붙여넣으세요. 모든 페이지 head에 삽입됩니다."
+
+      - name: ads_txt
+        label: ads.txt 입력
+        file: src/data/adsense/ads-txt.json
+        format: json
+        fields:
+          - label: ads.txt 한 줄
+            name: content
+            widget: string
+            required: false
+            hint: "AdSense → 사이트 → ads.txt 에서 복사한 한 줄. 예) google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0"
+
   - name: benefits
     label: 혜택/지원금
     label_singular: 혜택

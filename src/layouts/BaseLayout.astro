@@ -1,5 +1,8 @@
 ---
 import '../styles/global.css';
+import AdSenseHead from '../components/AdSenseHead.astro';
+import { getSiteSettings, resolveNavHref, isExternalHref } from '../utils/site-settings';
+import { getSiteIntegrationSnippets } from '../utils/site-integrations';
 
 interface Props {
   title?: string;
@@ -7,25 +10,33 @@ interface Props {
   path?: string;
 }
 
+const site = getSiteSettings();
 const {
-  title = '한전넷',
+  title = site.title,
   description = '전기요금 지원금·소상공인 전기지원금·에너지바우처 신청·조회 정보를 모아 안내합니다.',
   path = Astro.url.pathname,
 } = Astro.props;
 
 // 키워드 선행: 네이버 연관검색(전기요금 지원금·신청) 기준, 브랜드는 뒤로
 const fullTitle =
-  title === '한전넷' ? '전기요금 지원금 신청 안내 | 한전넷' : `${title} | 한전넷`;
-const siteOrigin = Astro.site?.origin ?? 'https://hanjeon.net';
+  title === site.title ? '전기요금 지원금 신청 안내 | 한전넷' : `${title} | ${site.title}`;
+const siteOrigin = Astro.site?.origin ?? site.site_url;
 const canonicalUrl = new URL(path || '/', siteOrigin).toString();
 const ogImageUrl = new URL('/og.jpg', siteOrigin).toString();
 const year = new Date().getFullYear();
-const nav = [
-  { href: '/', label: '홈' },
-  { href: '/find/', label: '지원금 찾기' },
-  { href: '/benefits/', label: '혜택 목록' },
-  { href: '/guides/', label: '가이드' },
-];
+const nav = site.nav.length
+  ? site.nav.map((item) => ({
+      href: resolveNavHref(item),
+      label: item.label,
+      external: isExternalHref(resolveNavHref(item)),
+    }))
+  : [
+      { href: '/', label: '홈', external: false },
+      { href: '/find/', label: '지원금 찾기', external: false },
+      { href: '/benefits/', label: '혜택 목록', external: false },
+      { href: '/guides/', label: '가이드', external: false },
+    ];
+const integrationSnippets = getSiteIntegrationSnippets();
 ---
 
 <!doctype html>
@@ -38,7 +49,7 @@ const nav = [
     <meta name="theme-color" content="#f7f4ef" />
     <link rel="canonical" href={canonicalUrl} />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="한전넷" />
+    <meta property="og:site_name" content={site.title} />
     <meta property="og:locale" content="ko_KR" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
@@ -56,8 +67,10 @@ const nav = [
     <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
-    <link rel="alternate" type="application/rss+xml" title="전기요금 지원금 | 한전넷" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`전기요금 지원금 | ${site.title}`} href="/rss.xml" />
     <title>{fullTitle}</title>
+    {integrationSnippets.map((html) => <Fragment set:html={html} />)}
+    <AdSenseHead />
   </head>
   <body>
     <header class="site-header">
@@ -73,14 +86,24 @@ const nav = [
             fetchpriority="high"
           />
           <span class="brand__text">
-            <span class="brand__name">한전넷</span>
+            <span class="brand__name">{site.title}</span>
             <span class="brand__tag">전기요금 지원금 안내</span>
           </span>
         </a>
         <nav class="nav" aria-label="주요">
           {
             nav.map((item) => (
-              <a href={item.href} aria-current={path === item.href || (item.href !== '/' && path.startsWith(item.href)) ? 'page' : undefined}>
+              <a
+                href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+                aria-current={
+                  !item.external &&
+                  (path === item.href || (item.href !== '/' && path.startsWith(item.href)))
+                    ? 'page'
+                    : undefined
+                }
+              >
                 {item.label}
               </a>
             ))
@@ -101,7 +124,17 @@ const nav = [
         <div class="container mobile-nav__inner">
           {
             nav.map((item) => (
-              <a href={item.href} aria-current={path === item.href || (item.href !== '/' && path.startsWith(item.href)) ? 'page' : undefined}>
+              <a
+                href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+                aria-current={
+                  !item.external &&
+                  (path === item.href || (item.href !== '/' && path.startsWith(item.href)))
+                    ? 'page'
+                    : undefined
+                }
+              >
                 {item.label}
               </a>
             ))
@@ -142,7 +175,10 @@ const nav = [
     <footer class="site-footer">
       <div class="container footer-inner">
         <p class="footer-copy">
-          © {year} hanjeon.net · <a class="footer-brand" href="/about/">한전넷</a>
+          © {year}{' '}
+          <a class="footer-brand" href={site.site_url}>{site.copyright_name}</a>
+          {' · '}
+          <a class="footer-brand" href="/about/">소개</a>
         </p>
         <p class="footer-note">
           한전넷은 한국전력과 관련없는 개인 웹사이트이며, 본 사이트는 한국전력공사·정부와 제휴·공식 관계가 없는

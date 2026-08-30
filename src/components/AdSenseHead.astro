@@ -1,0 +1,43 @@
+---
+import { hasHeadScript, getAdsenseConfig } from "../utils/adsense";
+
+const config = getAdsenseConfig();
+const raw = hasHeadScript(config) ? config.head_script.trim() : "";
+const client =
+  raw.match(/client=(ca-pub-\d+)/i)?.[1] ||
+  raw.match(/ca-pub-\d+/i)?.[0] ||
+  "";
+const deferAds = Boolean(client);
+---
+
+{
+  deferAds ? (
+    <script is:inline define:vars={{ client }}>
+      (function () {
+        window.adsbygoogle = window.adsbygoogle || [];
+        var loaded = false;
+        function loadAds() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement("script");
+          s.async = true;
+          s.src =
+            "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" +
+            client;
+          s.crossOrigin = "anonymous";
+          document.head.appendChild(s);
+        }
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(loadAds, { timeout: 4500 });
+        } else {
+          setTimeout(loadAds, 3500);
+        }
+        ["scroll", "pointerdown", "keydown", "touchstart"].forEach(function (type) {
+          window.addEventListener(type, loadAds, { once: true, passive: true });
+        });
+      })();
+    </script>
+  ) : (
+    raw && <Fragment set:html={raw} />
+  )
+}
