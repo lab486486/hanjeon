@@ -1,5 +1,6 @@
 /**
  * Sidebar: "쿠팡파트너스 API Key" → /admin/coupang (new tab)
+ * Creates the link once. Position is owned by cms-sidebar-order.js.
  */
 (function () {
   const PAGE = "/admin/coupang";
@@ -31,78 +32,62 @@
     const sidebar = getSidebar(root);
     if (!sidebar) return;
 
-    let link = sidebar.querySelector("a.cms-coupang-nav");
-    const shortlinks = sidebar.querySelector("a.cms-shortlinks-nav");
-    const adsense =
-      sidebar.querySelector('a[href="#/collections/adsense"]') ||
-      sidebar.querySelector('a[href*="#/collections/adsense"]');
+    const existing = sidebar.querySelector("a.cms-coupang-nav");
+    if (existing && existing.closest("li, .cms-coupang-nav-row")) {
+      existing.href = PAGE;
+      existing.target = "_blank";
+      existing.rel = "noopener";
+      return;
+    }
+
     const sample =
-      shortlinks ||
-      adsense ||
+      sidebar.querySelector('a[href="#/collections/adsense"]') ||
+      sidebar.querySelector('a[href*="#/collections/adsense"]') ||
       sidebar.querySelector('a[href="#/collections/nav"]') ||
       sidebar.querySelector('a[href^="#/collections/"]');
     if (!sample || !sample.parentElement) return;
-
-    if (!link) {
-      link = document.createElement("a");
-      link.className = "cms-coupang-nav cms-collection-link";
-      link.dataset.collection = "coupang";
-      copySampleClasses(sample, link);
-
-      const icon = document.createElement("span");
-      icon.className = "cms-collection-icon";
-      icon.setAttribute("aria-hidden", "true");
-      icon.innerHTML = ICON;
-      link.appendChild(icon);
-
-      const label = document.createElement("span");
-      label.className = "cms-coupang-label";
-      label.textContent = "쿠팡파트너스 API Key";
-      link.appendChild(label);
-
-      link.addEventListener("click", function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        window.open(PAGE, "_blank", "noopener");
-      });
-    }
-
-    if (!link.querySelector(".cms-coupang-external")) {
-      const external = document.createElement("span");
-      external.className = "cms-coupang-external";
-      external.setAttribute("aria-hidden", "true");
-      external.title = "새 창에서 열기";
-      external.innerHTML = EXTERNAL_ICON;
-      link.appendChild(external);
-    }
-
-    link.href = PAGE;
-    link.target = "_blank";
-    link.rel = "noopener";
-    link.title = "쿠팡파트너스 API Key 설정";
 
     const sampleRow = sample.closest("li") || sample.parentElement;
     const list = sampleRow && sampleRow.parentElement;
     if (!list) return;
 
-    let row = link.closest("li");
-    const nestedInCollection =
-      link.parentElement === sample.parentElement && sample.tagName === "A";
-    if (!row || nestedInCollection) {
-      row = document.createElement(sampleRow.tagName === "LI" ? "LI" : "DIV");
-      row.className = "cms-coupang-nav-row";
-      row.appendChild(link);
-    }
+    const link = document.createElement("a");
+    link.className = "cms-coupang-nav cms-collection-link";
+    link.dataset.collection = "coupang";
+    copySampleClasses(sample, link);
 
-    const anchor = shortlinks || adsense;
-    const anchorRow = anchor ? anchor.closest("li") || anchor.parentElement : null;
-    if (anchorRow && anchorRow.parentElement === list) {
-      if (row.nextElementSibling !== anchorRow) {
-        list.insertBefore(row, anchorRow);
-      }
-    } else if (row.parentElement !== list) {
-      list.insertBefore(row, sampleRow);
-    }
+    const icon = document.createElement("span");
+    icon.className = "cms-collection-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.innerHTML = ICON;
+    link.appendChild(icon);
+
+    const label = document.createElement("span");
+    label.className = "cms-coupang-label";
+    label.textContent = "쿠팡파트너스 API Key";
+    link.appendChild(label);
+
+    const external = document.createElement("span");
+    external.className = "cms-coupang-external";
+    external.setAttribute("aria-hidden", "true");
+    external.title = "새 창에서 열기";
+    external.innerHTML = EXTERNAL_ICON;
+    link.appendChild(external);
+
+    link.href = PAGE;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.title = "쿠팡파트너스 API Key 설정";
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      window.open(PAGE, "_blank", "noopener");
+    });
+
+    const row = document.createElement(sampleRow.tagName === "LI" ? "LI" : "DIV");
+    row.className = "cms-coupang-nav-row";
+    row.appendChild(link);
+    list.appendChild(row);
   }
 
   function sync() {

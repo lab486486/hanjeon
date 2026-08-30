@@ -2,8 +2,7 @@
  * Reorder Decap CMS sidebar into three groups with dividers:
  * 1) Site settings  2) Monetization  3) Content collections
  *
- * Only mutates the list when order actually changed. Repeated appendChild
- * on every MutationObserver tick detaches React Router links and clicks do nothing.
+ * Single owner of menu order. Do not move nodes unless the order changed.
  */
 (function () {
   var GROUPS = [
@@ -44,15 +43,13 @@
   }
 
   function findCollectionLink(sidebar, name) {
-    var byData = sidebar.querySelector('a.cms-collection-link[data-collection="' + name + '"]');
-    if (byData && !byData.classList.contains("cms-coupang-nav")) return byData;
     var links = sidebar.querySelectorAll('a[href^="#/collections/"]');
     for (var i = 0; i < links.length; i++) {
       var href = links[i].getAttribute("href") || "";
       var m = href.match(/^#\/collections\/([^/?#]+)\/?$/);
       if (m && m[1] === name) return links[i];
     }
-    return null;
+    return sidebar.querySelector('a.cms-collection-link[data-collection="' + name + '"]:not(.cms-coupang-nav)');
   }
 
   function findLink(sidebar, item) {
@@ -62,6 +59,9 @@
 
   function rowOf(link) {
     if (!link) return null;
+    if (link.classList.contains("cms-coupang-nav")) {
+      return link.closest(".cms-coupang-nav-row") || link.closest("li") || link.parentElement;
+    }
     return link.closest("li") || link.parentElement;
   }
 
@@ -124,10 +124,8 @@
         group.items.forEach(function (item) {
           var link = findLink(sidebar, item);
           var row = rowOf(link);
-          if (!row || (row.parentElement && row.parentElement !== list && !list.contains(row))) {
-            return;
-          }
-          if (!row || seen.has(row)) return;
+          if (!row || row.parentElement !== list) return;
+          if (seen.has(row)) return;
           orderedRows.push(row);
           seen.add(row);
         });
@@ -149,16 +147,14 @@
       if (sameNodeList(current, desired)) return;
 
       desired.forEach(function (row) {
-        if (row.parentElement !== list && row.parentElement) {
-          list.appendChild(row);
-        } else {
-          list.appendChild(row);
-        }
+        list.appendChild(row);
       });
     } finally {
       applying = false;
       if (observer) {
-        observer.observe(getRoot(), { childList: true, subtree: true });
+        observer.observe(root, { childList: true, subtree: false });
+        var listEl = findList(getSidebar(root));
+        if (listEl) observer.observe(listEl, { childList: true });
       }
     }
   }
